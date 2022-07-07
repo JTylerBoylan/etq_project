@@ -86,10 +86,10 @@ int main (int argc, char **argv) {
 
             geometry_msgs::PoseArray pose_arr, path_arr;
 
-            pose_arr.header.frame_id = "map";
+            pose_arr.header.frame_id = "world";
             pose_arr.header.stamp = ros::Time::now();
 
-            path_arr.header.frame_id = "map";
+            path_arr.header.frame_id = "world";
             path_arr.header.stamp = ros::Time::now();
 
             planner.allPoses(pose_arr);

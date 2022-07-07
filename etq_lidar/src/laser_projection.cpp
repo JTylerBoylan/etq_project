@@ -16,7 +16,7 @@ int main(int argc, char ** argv) {
     geometry_msgs::Pose latest_pose;
 
     grid_map::GridMap map({"elevation", "terrain", "obstacle"});
-    map.setFrameId("map");
+    map.setFrameId("world");
     map.setGeometry(grid_map::Length(10,10), 0.10, grid_map::Position(0,0));
 
     ETQLidarMap lidar(map);
@@ -41,7 +41,7 @@ int main(int argc, char ** argv) {
 
     ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>("etq/pose", 1, poseCallback);
 
-    ros::Subscriber laser_sub = nh.subscribe<sensor_msgs::LaserScan>("scan", 1, laserCallback);
+    ros::Subscriber laser_sub = nh.subscribe<sensor_msgs::LaserScan>("etq/scan", 1, laserCallback);
 
     ros::spin();
 

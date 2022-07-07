@@ -18,7 +18,7 @@ int main(int argc, char ** argv) {
         geometry_msgs::PointStamped goal_point;
 
         goal_point.header.stamp = ros::Time::now();
-        goal_point.header.frame_id = "map";
+        goal_point.header.frame_id = "world";
 
         goal_point.point.x = 5.0;
         goal_point.point.y = 3.0;

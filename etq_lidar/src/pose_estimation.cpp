@@ -9,7 +9,7 @@ int main (int argc, char** argv) {
     ros::NodeHandle node;
 
     geometry_msgs::PoseStamped pose;
-    pose.header.frame_id = "map";
+    pose.header.frame_id = "world";
 
     bool new_pose = false;
 
@@ -26,7 +26,7 @@ int main (int argc, char** argv) {
         new_pose = true;
     };
 
-    ros::Subscriber imu_sub = node.subscribe<sensor_msgs::Imu>("imu/data", 1, imuCallback);
+    ros::Subscriber imu_sub = node.subscribe<sensor_msgs::Imu>("etq/imu/data", 1, imuCallback);
 
     ros::Publisher pose_pub = node.advertise<geometry_msgs::PoseStamped>("etq/pose", 1, true);
 
