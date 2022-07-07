@@ -1,0 +1,12 @@
+<launch>
+  <node name="obstacles" pkg="rosbag" type="play" args="--clock $(find etq_demo)/rosbags/test1.bag"/>
+  <node name="demo_goal" pkg="etq_demo" type="demo_goal"/>
+  <node name="pose_estimation" pkg="etq_lidar" type="pose_estimation"/>
+  <node name="laser_projection" pkg="etq_lidar" type="laser_projection" output="screen"/>
+  <node name="local_planner" pkg="etq_planner" type="local_planner" output="screen"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find etq_demo)/rviz_config.rviz"/>
+</launch>
+
+<?ignore
+launch-prefix="valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes --keep-stacktraces=alloc-and-free --log-file='valgrind_log2.log'"
+?>
