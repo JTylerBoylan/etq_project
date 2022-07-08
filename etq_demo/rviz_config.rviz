@@ -6,8 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /OccupancyGrid1
-        - /OccupancyMap1
+        - /Map1
       Splitter Ratio: 0.5
     Tree Height: 839
   - Class: rviz/Selection
@@ -94,12 +93,12 @@ Visualization Manager:
       Class: rviz/Pose
       Color: 0; 0; 255
       Enabled: true
-      Head Length: 0.15000000596046448
-      Head Radius: 0.20000000298023224
+      Head Length: 0.125
+      Head Radius: 0.1875
       Name: Pose
       Queue Size: 10
-      Shaft Length: 0.30000001192092896
-      Shaft Radius: 0.15000000596046448
+      Shaft Length: 0.25
+      Shaft Radius: 0.125
       Shape: Arrow
       Topic: etq/pose
       Unreliable: false
@@ -184,13 +183,12 @@ Visualization Manager:
       Voxel Coloring: Z-Axis
       Voxel Rendering: Occupied Voxels
     - Alpha: 0.699999988079071
-      Class: octomap_rviz_plugin/OccupancyMap
+      Class: rviz/Map
       Color Scheme: map
       Draw Behind: false
       Enabled: true
-      Max. Octree Depth: 16
-      Name: OccupancyMap
-      Octomap Binary Topic: /octomap_binary
+      Name: Map
+      Topic: /projected_map
       Unreliable: false
       Use Timestamp: false
       Value: true
@@ -222,7 +220,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10
+      Distance: 11.199999809265137
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -238,9 +236,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8547965288162231
+      Pitch: 0.6997964978218079
       Target Frame: <Fixed Frame>
-      Yaw: 5.388583183288574
+      Yaw: 4.748581409454346
     Saved: ~
 Window Geometry:
   Displays:

@@ -1,5 +1,5 @@
 <launch>
-  <node name="obstacles" pkg="rosbag" type="play" args="--clock $(find etq_demo)/rosbags/slope_scan.bag"/>
+  <node name="obstacles" pkg="rosbag" type="play" args="--clock $(find etq_demo)/rosbags/pitch_scan.bag"/>
   <node name="lidar_conversion" pkg="etq_lidar" type="lidar_conversion"/>
 
   <node name="demo_goal" pkg="etq_demo" type="demo_goal"/>
@@ -14,6 +14,8 @@
     <param name="resolution" type="double" value="0.10"/>
     <param name="height_map" type="bool" value="true"/>
     <param name="sensor_model/max_range" type="double" value="5.0"/>
+    <param name="pointcloud_min_z" type="double" value="0.0"/>
+    <param name="pointcloud_max_z" type="double" value="5.0"/>
   </node>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find etq_demo)/rviz_config.rviz"/>
