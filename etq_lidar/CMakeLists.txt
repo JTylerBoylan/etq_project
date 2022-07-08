@@ -24,17 +24,17 @@ add_library(${PROJECT_NAME}
   src/lidar_mapper.cpp
 )
 
-add_executable(laser_projection src/laser_projection.cpp)
+add_executable(laser_projection src/lidar_projection_node.cpp)
 target_link_libraries(laser_projection ${catkin_LIBRARIES} ${PROJECT_NAME})
 
-add_executable(pose_estimation src/pose_estimation.cpp)
+add_executable(pose_estimation src/pose_estimation_node.cpp)
 target_link_libraries(pose_estimation ${catkin_LIBRARIES} ${PROJECT_NAME})
 
-add_executable(world2lidar_transform src/world2lidar_transform.cpp)
+add_executable(world2lidar_transform src/world2lidar_tf_node.cpp)
 target_link_libraries(world2lidar_transform ${catkin_LIBRARIES} ${PROJECT_NAME})
 
-add_executable(lidar_conversion src/lidar_conversion.cpp)
+add_executable(lidar_conversion src/lidar_stamp_node.cpp)
 target_link_libraries(lidar_conversion ${catkin_LIBRARIES} ${PROJECT_NAME})
 
-add_executable(scan2cloud_conversion src/scan2cloud_conversion.cpp)
+add_executable(scan2cloud_conversion src/scan2cloud_node.cpp)
 target_link_libraries(scan2cloud_conversion ${catkin_LIBRARIES} ${PROJECT_NAME})

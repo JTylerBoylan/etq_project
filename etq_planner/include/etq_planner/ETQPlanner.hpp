@@ -35,7 +35,7 @@
 #define MAX_PITCH M_PI / 4.0
 #define MAX_ROLL M_PI / 6.0
 
-#define ETQ_HEIGHT 0.25f
+#define ETQ_HEIGHT 0.05f
 
 using namespace geometry_msgs;
 using namespace grid_map;

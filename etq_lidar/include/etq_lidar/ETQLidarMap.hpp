@@ -6,7 +6,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Pose.h>
 
-#define R2L_ANGLE 7.0/12.0*M_PI
+#define R2L_ANGLE 15.0/24.0*M_PI
 
 #define SCAN_RANGE_MAX 10.0
 #define SCAN_RANGE_MIN 0.10

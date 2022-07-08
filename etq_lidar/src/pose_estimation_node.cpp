@@ -4,7 +4,7 @@
 #include <geometry_msgs/Quaternion.h>
 #include <tf2/LinearMath/Quaternion.h>
 
-#define ETQ_HEIGHT 0.25
+#define ETQ_HEIGHT 0.10
 
 int main (int argc, char** argv) {
 

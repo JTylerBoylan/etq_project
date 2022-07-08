@@ -1,20 +1,27 @@
 <launch>
-  <node name="obstacles" pkg="rosbag" type="play" args="--clock $(find etq_demo)/rosbags/yaw_scan.bag"/>
+  <node name="obstacles" pkg="rosbag" type="play" args="--clock $(find etq_demo)/rosbags/slope_scan.bag"/>
   <node name="lidar_conversion" pkg="etq_lidar" type="lidar_conversion"/>
 
   <node name="demo_goal" pkg="etq_demo" type="demo_goal"/>
   <node name="pose_estimation" pkg="etq_lidar" type="pose_estimation"/>
 
   <node name="world2lidar_transform" pkg="etq_lidar" type="world2lidar_transform"/>
-  <node name="scan2cloud_conversion" pkg="etq_lidar" type="scan2cloud_conversion" output="screen"/>
+  <node name="scan2cloud_conversion" pkg="etq_lidar" type="scan2cloud_conversion"/>
 
-  <node name="laser_projection" pkg="etq_lidar" type="laser_projection"/>
-
-  <node name="local_planner" pkg="etq_planner" type="local_planner" output="screen"/>
+  <node name="octomap_server" pkg="octomap_server" type="octomap_server_node">
+    <param name="frame_id" type="string" value="world"/>
+    <param name="base_frame_id" type="string" value="world"/>
+    <param name="resolution" type="double" value="0.10"/>
+    <param name="height_map" type="bool" value="true"/>
+    <param name="sensor_model/max_range" type="double" value="5.0"/>
+  </node>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find etq_demo)/rviz_config.rviz"/>
 </launch>
 
 <?ignore
 launch-prefix="valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes --keep-stacktraces=alloc-and-free --log-file='valgrind_log2.log'"
+  <node name="laser_projection" pkg="etq_lidar" type="laser_projection"/>
+
+  <node name="local_planner" pkg="etq_planner" type="local_planner" output="screen"/>
 ?>
