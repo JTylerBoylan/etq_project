@@ -95,10 +95,10 @@ int main (int argc, char **argv) {
         pub_path.publish(path_arr);
         ROS_INFO("Path poses array (timestamp %f) published.", pose_arr.header.stamp.toSec());
 
-    }
 
-    ros::spinOnce();
-    rate.sleep();
+        ros::spinOnce();
+        rate.sleep();
+    }
 
     return 0;
 }

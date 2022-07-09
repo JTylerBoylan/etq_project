@@ -1,5 +1,4 @@
 #include <etq_lidar/ETQLidarMap.hpp>
-#include <grid_map_core/iterators/LineIterator.hpp>
 
 namespace etq_lidar {
 
@@ -7,7 +6,7 @@ namespace etq_lidar {
 
         // New Map
         map["elevation"].setConstant(0.0);
-        map["value"].setConstant(-1.0);
+        map["value"].setConstant(-VALUE_MAX);
 
         _map = &map;
 
@@ -48,6 +47,11 @@ namespace etq_lidar {
             // Transformation
             point = _rotation * point + _origin;
 
+            // Filter by height
+            if (point.z() > SCAN_HEIGHT_MAX ||
+                point.z() < SCAN_HEIGHT_MIN)
+                continue;
+
             // Add to Grid
             _add_to_grid(point);
         }
@@ -56,17 +60,56 @@ namespace etq_lidar {
 
     void ETQLidarMap::_add_to_grid(const Vector3f &point) {
 
-        grid_map::Position position(point.x(), point.y());
-        grid_map::Position origin(_origin.x(), _origin.y());
+        // Map Data Function
+        float *val, *elv;
+        const auto _map_data = [&](const double x, const double y) {
+            grid_map::Position pos(x,y);
+            if (!_map->isInside(pos))
+                return false;
+            val = &(_map->atPosition("value", pos));
+            elv = &(_map->atPosition("elevation", pos));
+            return true;
+        };
 
-        if (!_map->isInside(position))
-            return;
+        // Ray cast
+        float increment = 1.0f / RAY_CAST_SIZE;
+        for (float f = 0; f < 1.0f; f += increment) {
 
-        for (auto iter = grid_map::LineIterator(*_map, origin, position); !iter.isPastEnd(); ++iter) {
-            _map->at("value", *iter) = 0.0;
+            Vector3f ray = _origin + f * (point - _origin);
+
+            if (!_map_data(ray.x(), ray.y()))
+                return;
+
+            if (*elv > ray.z() || *val < 0) {
+                *val = *val > 0 ? *val - 1 : 0;
+                if (*val < VALUE_THRESHOLD)
+                    *elv = 0.0; // Replace with ground plane
+            }
+
         }
 
-        _map->atPosition("elevation", position) = point.z();
+        // End point
+        if (!_map_data(point.x(), point.y()))
+            return;
+        
+        *val = *val < VALUE_MAX ? *val + 1 : VALUE_MAX;
+
+        // Point thickness
+        if (*val > VALUE_THRESHOLD && point.z() > *elv) {
+
+            *elv = point.z();
+
+            float res = _map->getResolution();
+            for (int nx = -POINT_THICKNESS; nx <= POINT_THICKNESS; nx++)
+                for (int ny = -POINT_THICKNESS; ny <= POINT_THICKNESS; ny++)
+                    if (_map_data(point.x() + nx*res, point.y() + ny*res) && *val < 0) {
+                        *elv = point.z();
+                        *val = 0.0;
+                    }
+
+        }
+
+        // TODO: Change bounds based on ground plane
 
         // End Add to Grid
     }

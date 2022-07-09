@@ -6,10 +6,16 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Pose.h>
 
-#define SCAN_RANGE_MAX 10.0
+#define SCAN_RANGE_MAX 4.0
 #define SCAN_RANGE_MIN 0.10
 
-#define RAY_CAST_SIZE 25
+#define SCAN_HEIGHT_MAX 2.0
+#define SCAN_HEIGHT_MIN 0.0
+
+#define RAY_CAST_SIZE 50
+
+#define VALUE_MAX 40
+#define VALUE_THRESHOLD 30
 
 #define POINT_THICKNESS 1
 

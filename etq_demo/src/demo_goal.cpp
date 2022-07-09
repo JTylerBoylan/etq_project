@@ -20,8 +20,8 @@ int main(int argc, char ** argv) {
         goal_point.header.stamp = ros::Time::now();
         goal_point.header.frame_id = "world";
 
-        goal_point.point.x = 5.0;
-        goal_point.point.y = 3.0;
+        goal_point.point.x = -4.0;
+        goal_point.point.y = 4.0;
         goal_point.point.z = 0.0;
 
         goal_pub.publish(goal_point);

@@ -19,7 +19,7 @@
 
 #define GOAL_RADIUS_SQUARED 1.0f
 
-#define SAMPLE_SIZE 4
+#define SAMPLE_SIZE 8
 
 #define SAMPLE_TIME 1.0f
 #define SAMPLE_DELTA_TIME 0.1f
@@ -32,7 +32,7 @@
 #define COST_DELTA_V 0.50f
 #define COST_DELTA_U 0.25f 
 
-#define MAX_PITCH M_PI / 4.0
+#define MAX_PITCH M_PI / 3.0
 #define MAX_ROLL M_PI / 6.0
 
 #define ETQ_HEIGHT 0.05f
@@ -46,8 +46,8 @@ namespace etq_planner
     class ETQPlanner 
     {
 
-    const float _vel_lookup[SAMPLE_SIZE] = {1.0f, 1.0f, 1.0f, -1.0f};
-    const float _rot_lookup[SAMPLE_SIZE] = {M_PI_4, 0.0f, -M_PI_4, 0.0f};
+    const float _vel_lookup[SAMPLE_SIZE] = {-1.0f, 0.125f, 0.5f, 0.75f, 1.0f, 0.75f, 0.5f, 0.0f};
+    const float _rot_lookup[SAMPLE_SIZE] = {0.0f, M_PI_4/4.0, M_PI_4/2.0, M_PI_4/2.0, 0.0f, -M_PI_4/2.0, -M_PI_4/2.0, -M_PI_4/4.0};
 
     public:
 
