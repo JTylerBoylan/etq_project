@@ -8,14 +8,14 @@ using namespace etq_lidar;
 
 int main(int argc, char ** argv) {
 
-    ros::init(argc, argv, "laser_projector");
+    ros::init(argc, argv, "lidar_projector");
     ros::NodeHandle nh;
 
     ros::Publisher map_pub = nh.advertise<grid_map_msgs::GridMap>("etq/map", 1, true);
 
     geometry_msgs::Pose latest_pose;
 
-    grid_map::GridMap map({"elevation", "terrain", "obstacle"});
+    grid_map::GridMap map({"elevation", "value"});
     map.setFrameId("world");
     map.setGeometry(grid_map::Length(10,10), 0.10, grid_map::Position(0,0));
 

@@ -24,8 +24,8 @@ add_library(${PROJECT_NAME}
   src/lidar_mapper.cpp
 )
 
-add_executable(laser_projection src/lidar_projection_node.cpp)
-target_link_libraries(laser_projection ${catkin_LIBRARIES} ${PROJECT_NAME})
+add_executable(lidar_projection src/lidar_projection_node.cpp)
+target_link_libraries(lidar_projection ${catkin_LIBRARIES} ${PROJECT_NAME})
 
 add_executable(pose_estimation src/pose_estimation_node.cpp)
 target_link_libraries(pose_estimation ${catkin_LIBRARIES} ${PROJECT_NAME})

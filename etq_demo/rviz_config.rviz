@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Map1
+        - /GridMap1
       Splitter Ratio: 0.5
     Tree Height: 839
   - Class: rviz/Selection
@@ -170,27 +170,26 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-    - Class: octomap_rviz_plugin/OccupancyGrid
-      Enabled: false
-      Max. Height Display: 3.4028234663852886e+38
-      Max. Octree Depth: 16
-      Min. Height Display: -3.4028234663852886e+38
-      Name: OccupancyGrid
-      Octomap Topic: /octomap_full
-      Queue Size: 5
-      Value: false
-      Voxel Alpha: 1
-      Voxel Coloring: Z-Axis
-      Voxel Rendering: Occupied Voxels
-    - Alpha: 0.699999988079071
-      Class: rviz/Map
-      Color Scheme: map
-      Draw Behind: false
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Class: grid_map_rviz_plugin/GridMap
+      Color: 200; 200; 200
+      Color Layer: elevation
+      Color Transformer: GridMapLayer
       Enabled: true
-      Name: Map
-      Topic: /projected_map
+      Height Layer: elevation
+      Height Transformer: GridMapLayer
+      History Length: 1
+      Invert Rainbow: true
+      Max Color: 255; 0; 0
+      Max Intensity: 10
+      Min Color: 0; 255; 0
+      Min Intensity: 0
+      Name: GridMap
+      Show Grid Lines: true
+      Topic: /etq/map
       Unreliable: false
-      Use Timestamp: false
+      Use Rainbow: false
       Value: true
   Enabled: true
   Global Options:
@@ -236,9 +235,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6997964978218079
+      Pitch: 0.654796302318573
       Target Frame: <Fixed Frame>
-      Yaw: 4.748581409454346
+      Yaw: 4.823580741882324
     Saved: ~
 Window Geometry:
   Displays:
