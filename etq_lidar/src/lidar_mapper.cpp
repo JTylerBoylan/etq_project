@@ -31,9 +31,16 @@ namespace etq_lidar {
 
             float r = scan.ranges[i];
 
+            float it = scan.intensities[i];
+
             // Filter by range
             if (r > SCAN_RANGE_MAX ||
                 r < SCAN_RANGE_MIN)
+                continue;
+
+            // Filter by intensity
+            if (it > SCAN_INTENSITY_MAX ||
+                it < SCAN_INTENSITY_MIN)
                 continue;
             
             // Convert to cartesian

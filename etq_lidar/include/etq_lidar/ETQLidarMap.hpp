@@ -9,15 +9,18 @@
 #define SCAN_RANGE_MAX 4.0
 #define SCAN_RANGE_MIN 0.10
 
+#define SCAN_INTENSITY_MIN 10
+#define SCAN_INTENSITY_MAX 65535
+
 #define SCAN_HEIGHT_MAX 2.0
 #define SCAN_HEIGHT_MIN 0.0
 
 #define RAY_CAST_SIZE 50
 
-#define VALUE_MAX 40
-#define VALUE_THRESHOLD 30
+#define VALUE_MAX 20
+#define VALUE_THRESHOLD 3
 
-#define POINT_THICKNESS 1
+#define POINT_THICKNESS 3
 
 using namespace Eigen;
 

@@ -186,7 +186,7 @@ Visualization Manager:
       Min Color: 0; 255; 0
       Min Intensity: 0
       Name: GridMap
-      Show Grid Lines: true
+      Show Grid Lines: false
       Topic: /etq/map
       Unreliable: false
       Use Rainbow: true
@@ -219,7 +219,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.2172036170959473
+      Distance: 9.043145179748535
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -227,17 +227,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.2216677963733673
-        Y: 0.2067916840314865
-        Z: 0.18892747163772583
+        X: -0.07530377805233002
+        Y: -0.5422807931900024
+        Z: -0.442124605178833
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.38979610800743103
+      Pitch: 0.8747960329055786
       Target Frame: <Fixed Frame>
-      Yaw: 5.533581256866455
+      Yaw: 4.708580017089844
     Saved: ~
 Window Geometry:
   Displays:
