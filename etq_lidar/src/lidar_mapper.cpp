@@ -1,4 +1,5 @@
 #include <etq_lidar/ETQLidarMap.hpp>
+#include <grid_map_core/iterators/LineIterator.hpp>
 
 namespace etq_lidar {
 
@@ -67,56 +68,87 @@ namespace etq_lidar {
 
     void ETQLidarMap::_add_to_grid(const Vector3f &point) {
 
-        // Map Data Function
-        float *val, *elv;
-        const auto _map_data = [&](const double x, const double y) {
-            grid_map::Position pos(x,y);
-            if (!_map->isInside(pos))
-                return false;
-            val = &(_map->atPosition("value", pos));
-            elv = &(_map->atPosition("elevation", pos));
-            return true;
-        };
+        // Check if point is in map
+        if (!_map->isInside(grid_map::Position(point.x(), point.y())))
+            return;
+
+        // Get index of start and end points
+        grid_map::Index odx, idx;
+        _map->getIndex(grid_map::Position(_origin.x(), _origin.y()), odx);
+        _map->getIndex(grid_map::Position(point.x(), point.y()), idx);
 
         // Ray cast
+        grid_map::Index last = odx, next;
+        float *elevation, *value;
         float increment = 1.0f / RAY_CAST_SIZE;
+
         for (float f = 0; f < 1.0f; f += increment) {
 
+            // Determine point on ray
             Vector3f ray = _origin + f * (point - _origin);
 
-            if (!_map_data(ray.x(), ray.y()))
-                return;
+            // Get position and index
+            grid_map::Position pos(ray.x(), ray.y());
+            _map->getIndex(pos, next);
 
-            if (*elv > ray.z() || *val < 0) {
-                *val = *val > 0 ? *val - 1 : 0;
-                if (*val < VALUE_THRESHOLD)
-                    *elv = 0.0; // Replace with ground plane
+            // Skip if repeat
+            if ((next == last).all())
+                continue;
+
+            // End cast before end point
+            if ((next == idx).all())
+                break;
+
+            // Get elevation and value
+            elevation = &(_map->at("elevation", next));
+            value = &(_map->at("value", next));
+
+            // Negate value if elevation contrasts ray value or if uninitialized
+            if (*elevation > ray.z() || *value < 0) {
+
+                *value = *value > 0 ? *value - 1 : 0;
+
+                // Erase from map if below threshold
+                if (*value < VALUE_THRESHOLD)
+                    *elevation = 0.0; // Replace with ground plane
             }
 
         }
 
         // End point
-        if (!_map_data(point.x(), point.y()))
-            return;
+        elevation = &(_map->at("elevation", idx));
+        value = &(_map->at("value", idx));
         
-        *val = *val < VALUE_MAX ? *val + 1 : VALUE_MAX;
+        // Add to value
+        *value = *value < VALUE_MAX ? *value + 1 : VALUE_MAX;
 
         // Point thickness
-        if (*val > VALUE_THRESHOLD && point.z() > *elv) {
+        if (*value > VALUE_THRESHOLD && point.z() > *elevation) {
 
-            *elv = point.z();
-
+            *elevation = point.z();
             float res = _map->getResolution();
-            for (int nx = -POINT_THICKNESS; nx <= POINT_THICKNESS; nx++)
-                for (int ny = -POINT_THICKNESS; ny <= POINT_THICKNESS; ny++)
-                    if (_map_data(point.x() + nx*res, point.y() + ny*res) && *val < 0) {
-                        *elv = point.z();
-                        *val = 0.0;
+
+            // Square iterator
+            for (int nx = -POINT_THICKNESS; nx <= POINT_THICKNESS; nx++) {
+                for (int ny = -POINT_THICKNESS; ny <= POINT_THICKNESS; ny++) {
+
+                    grid_map::Position p(point.x() + nx*res, point.y() + ny*res);
+                    if (_map->isInside(p)) {
+
+                        value = &(_map->atPosition("value", p));
+
+                        // Only update if uninitialized
+                        if (*value < 0) {
+                            _map->atPosition("elevation", p) = point.z();
+                            *value = 0.0;
+                        }
+
                     }
 
-        }
+                }
+            }
 
-        // TODO: Change bounds based on ground plane
+        }
 
         // End Add to Grid
     }
