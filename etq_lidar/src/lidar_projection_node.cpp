@@ -17,7 +17,7 @@ int main(int argc, char ** argv) {
 
     grid_map::GridMap map({"elevation", "value"});
     map.setFrameId("world");
-    map.setGeometry(grid_map::Length(10,10), 0.03125, grid_map::Position(0,0));
+    map.setGeometry(grid_map::Length(10,10), 0.0625, grid_map::Position(0,0));
 
     ETQLidarMap lidar(map);
 
