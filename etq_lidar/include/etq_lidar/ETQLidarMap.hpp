@@ -17,8 +17,8 @@
 
 #define RAY_CAST_SIZE 50
 
-#define VALUE_MAX 20
-#define VALUE_THRESHOLD 15
+#define VALUE_MAX 2
+#define VALUE_THRESHOLD 1
 
 #define POINT_THICKNESS 3
 
