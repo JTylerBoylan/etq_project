@@ -11,22 +11,12 @@ int main(int argc, char ** argv) {
     ros::init(argc, argv, "lidar_projector");
     ros::NodeHandle nh;
 
-    ros::Publisher map_pub = nh.advertise<grid_map_msgs::GridMap>("etq/map", 1, true);
+    ros::Publisher map_pub = nh.advertise<grid_map_msgs::GridMap>("etq/elevation_map", 1, true);
 
     geometry_msgs::Pose latest_pose;
     sensor_msgs::LaserScan latest_scan;
 
-    grid_map::GridMap map({"elevation",
-                           "elevation_inpainted",
-                           "elevation_smooth",
-                           "normal_x",
-                           "normal_y",
-                           "normal_z",
-                           "slope",
-                           "roughness",
-                           "edges",
-                           "traversability"
-                          });
+    grid_map::GridMap map({"elevation"});
     
     map.setFrameId("world");
     map.setGeometry(grid_map::Length(5,5), 0.0625, grid_map::Position(0,0));
