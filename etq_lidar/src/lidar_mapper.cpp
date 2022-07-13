@@ -5,19 +5,11 @@ namespace etq_lidar {
 
     ETQLidarMap::ETQLidarMap(grid_map::GridMap &map) {
 
-        // New Map
-        map["elevation"].setConstant(0.0);
-        map["value"].setConstant(-VALUE_MAX);
-
         _map = &map;
 
         // Origin
         _origin << Vector3f::Zero();
         _rotation = Quaternionf::Identity();
-
-        // Ground Plane
-        _gnd << 0.0f, 0.0f, 1.0f, 
-                0.0f, 0.0f, 0.0f;
 
     }
 
@@ -64,90 +56,21 @@ namespace etq_lidar {
             _add_to_grid(point);
         }
 
-    } 
+    } /* inputLaserScan */
 
     void ETQLidarMap::_add_to_grid(const Vector3f &point) {
 
         // Get index of start and end points
         grid_map::Index odx, idx;
-        _map->getIndex(grid_map::Position(_origin.x(), _origin.y()), odx);
-        _map->getIndex(grid_map::Position(point.x(), point.y()), idx);
-
-        // Ray cast
-        grid_map::Index last = odx, next;
-        float *elevation, *value;
-        float increment = 1.0f / RAY_CAST_SIZE;
-
-        for (float f = 0; f < 1.0f; f += increment) {
-
-            // Determine point on ray
-            Vector3f ray = _origin + f * (point - _origin);
-
-            // Get position and index
-            grid_map::Position pos(ray.x(), ray.y());
-            if (!_map->getIndex(pos, next))
-                return;
-
-            // Skip if repeat
-            if ((next == last).all())
-                continue;
-
-            // End cast before end point
-            if ((next == idx).all())
-                break;
-
-            // Get elevation and value
-            elevation = &(_map->at("elevation", next));
-            value = &(_map->at("value", next));
-
-            // Negate value if elevation contrasts ray value or if uninitialized
-            if (*elevation - 0.15 > ray.z() || *value < 0) {
-
-                *value = *value > 0 ? *value - 1 : 0;
-
-                // Erase from map if below threshold
-                if (*value < VALUE_THRESHOLD)
-                    *elevation = 0.0; // Replace with ground plane
-            }
-
-        }
-
-        // End point
-        elevation = &(_map->at("elevation", idx));
-        value = &(_map->at("value", idx));
         
-        // Add to value
-        *value = *value < VALUE_MAX ? *value + 1 : VALUE_MAX;
+        if (!_map->getIndex(grid_map::Position(_origin.x(), _origin.y()), odx) ||
+            !_map->getIndex(grid_map::Position(point.x(), point.y()), idx))
+            return;
 
-        // Point thickness
-        if (*value > VALUE_THRESHOLD && point.z() > *elevation) {
-
+        float *elevation = _map->at("elevation", idx);
+        if (*elevation < point.z())
             *elevation = point.z();
-            float res = _map->getResolution();
+        
+    } /* _add_to_grid */
 
-            // Square iterator
-            for (int nx = -POINT_THICKNESS; nx <= POINT_THICKNESS; nx++) {
-                for (int ny = -POINT_THICKNESS; ny <= POINT_THICKNESS; ny++) {
-
-                    grid_map::Position p(point.x() + nx*res, point.y() + ny*res);
-                    if (_map->isInside(p)) {
-
-                        value = &(_map->atPosition("value", p));
-
-                        // Only update if uninitialized
-                        if (*value < 0) {
-                            _map->atPosition("elevation", p) = point.z();
-                            *value = 0.0;
-                        }
-
-                    }
-
-                }
-            }
-
-        }
-
-        // End Add to Grid
-    }
-
-}
+} /* namespace */
