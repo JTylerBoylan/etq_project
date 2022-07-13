@@ -16,7 +16,18 @@ int main(int argc, char ** argv) {
     geometry_msgs::Pose latest_pose;
     sensor_msgs::LaserScan latest_scan;
 
-    grid_map::GridMap map({"elevation", "value"});
+    grid_map::GridMap map({"elevation",
+                           "elevation_inpainted",
+                           "elevation_smooth",
+                           "normal_x",
+                           "normal_y",
+                           "normal_z",
+                           "slope",
+                           "roughness",
+                           "edges",
+                           "traversability"
+                          });
+    
     map.setFrameId("world");
     map.setGeometry(grid_map::Length(5,5), 0.0625, grid_map::Position(0,0));
 
