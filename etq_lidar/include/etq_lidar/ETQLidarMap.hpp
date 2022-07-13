@@ -15,13 +15,6 @@
 #define SCAN_HEIGHT_MAX 2.0
 #define SCAN_HEIGHT_MIN 0.0
 
-#define RAY_CAST_SIZE 50
-
-#define VALUE_MAX 2
-#define VALUE_THRESHOLD 1
-
-#define POINT_THICKNESS 3
-
 using namespace Eigen;
 
 namespace etq_lidar {
