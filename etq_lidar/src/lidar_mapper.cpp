@@ -68,10 +68,6 @@ namespace etq_lidar {
 
     void ETQLidarMap::_add_to_grid(const Vector3f &point) {
 
-        // Check if point is in map
-        if (!_map->isInside(grid_map::Position(point.x(), point.y())))
-            return;
-
         // Get index of start and end points
         grid_map::Index odx, idx;
         _map->getIndex(grid_map::Position(_origin.x(), _origin.y()), odx);
@@ -89,7 +85,8 @@ namespace etq_lidar {
 
             // Get position and index
             grid_map::Position pos(ray.x(), ray.y());
-            _map->getIndex(pos, next);
+            if (!_map->getIndex(pos, next))
+                return;
 
             // Skip if repeat
             if ((next == last).all())
@@ -104,7 +101,7 @@ namespace etq_lidar {
             value = &(_map->at("value", next));
 
             // Negate value if elevation contrasts ray value or if uninitialized
-            if (*elevation > ray.z() || *value < 0) {
+            if (*elevation - 0.15 > ray.z() || *value < 0) {
 
                 *value = *value > 0 ? *value - 1 : 0;
 

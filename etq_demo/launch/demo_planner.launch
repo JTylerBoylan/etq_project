@@ -8,7 +8,7 @@
   <node name="world2lidar_transform" pkg="etq_lidar" type="world2lidar_transform"/>
   <node name="scan2cloud_conversion" pkg="etq_lidar" type="scan2cloud_conversion"/>
 
-  <node name="lidar_projection" pkg="etq_lidar" type="lidar_projection" output="screen"/>
+  <node name="lidar_projection" pkg="etq_lidar" type="lidar_projection"/>
 
   <node name="local_planner" pkg="etq_planner" type="local_planner" output="screen"/>
 

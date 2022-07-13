@@ -6,8 +6,8 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Pose.h>
 
-#define SCAN_RANGE_MAX 4.0
-#define SCAN_RANGE_MIN 0.10
+#define SCAN_RANGE_MAX 10
+#define SCAN_RANGE_MIN 0.25
 
 #define SCAN_INTENSITY_MIN 10
 #define SCAN_INTENSITY_MAX 65535

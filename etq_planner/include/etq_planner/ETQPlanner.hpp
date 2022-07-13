@@ -15,7 +15,7 @@
 #define MAX_G_SCORE_GLOBAL 100.0f
 
 #define MAX_PLAN_ITER_LOCAL 500
-#define MAX_G_SCORE_LOCAL 10.0f
+#define MAX_G_SCORE_LOCAL 4.0f
 
 #define GOAL_RADIUS_SQUARED 1.0f
 
@@ -46,8 +46,8 @@ namespace etq_planner
     class ETQPlanner 
     {
 
-    const float _vel_lookup[SAMPLE_SIZE] = {-1.0f, 0.125f, 0.5f, 0.75f, 1.0f, 0.75f, 0.5f, 0.0f};
-    const float _rot_lookup[SAMPLE_SIZE] = {0.0f, M_PI_4/4.0, M_PI_4/2.0, M_PI_4/2.0, 0.0f, -M_PI_4/2.0, -M_PI_4/2.0, -M_PI_4/4.0};
+    const float _vel_lookup[SAMPLE_SIZE] = {-1.0f, 0.5f, 0.75f, 1.0f, 0.75f, 0.5f};
+    const float _rot_lookup[SAMPLE_SIZE] = {0.0f, M_PI_4/2.0, M_PI_4/2.0, 0.0f, -M_PI_4/2.0, -M_PI_4/2.0};;
 
     public:
 
