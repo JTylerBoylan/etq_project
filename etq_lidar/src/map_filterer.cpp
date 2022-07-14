@@ -12,7 +12,7 @@ int main (int argc, char ** argv) {
   ros::NodeHandle node;
   
   filters::FilterChain<grid_map::GridMap> filterChain("grid_map::GridMap");
-  if (!filterChain.configure("grid_map_filters", node) {
+  if (!filterChain.configure("grid_map_filters", node)) {
     ROS_ERROR("Could not configure the filter chain!");
     return;
   }

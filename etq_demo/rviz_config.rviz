@@ -27,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -187,7 +187,7 @@ Visualization Manager:
       Min Intensity: 0
       Name: GridMap
       Show Grid Lines: false
-      Topic: /etq/map
+      Topic: /etq/elevation_map
       Unreliable: false
       Use Rainbow: true
       Value: true
@@ -235,9 +235,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8747960329055786
+      Pitch: 0.7847960591316223
       Target Frame: <Fixed Frame>
-      Yaw: 4.708580017089844
+      Yaw: 4.7235798835754395
     Saved: ~
 Window Geometry:
   Displays:

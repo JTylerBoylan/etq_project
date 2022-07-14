@@ -67,7 +67,7 @@ namespace etq_lidar {
             !_map->getIndex(grid_map::Position(point.x(), point.y()), idx))
             return;
 
-        float *elevation = _map->at("elevation", idx);
+        float *elevation = &(_map->at("elevation", idx));
         if (*elevation < point.z())
             *elevation = point.z();
         

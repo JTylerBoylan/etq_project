@@ -32,9 +32,3 @@ target_link_libraries(pose_estimation ${catkin_LIBRARIES} ${PROJECT_NAME})
 
 add_executable(world2lidar_transform src/world2lidar_tf_node.cpp)
 target_link_libraries(world2lidar_transform ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-add_executable(lidar_conversion src/lidar_stamp_node.cpp)
-target_link_libraries(lidar_conversion ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-add_executable(scan2cloud_conversion src/scan2cloud_node.cpp)
-target_link_libraries(scan2cloud_conversion ${catkin_LIBRARIES} ${PROJECT_NAME})

@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
 
     ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>("etq/pose", 10, poseCallback);
 
-    ros::Subscriber laser_sub = nh.subscribe<sensor_msgs::LaserScan>("scan", 10, laserCallback);
+    ros::Subscriber laser_sub = nh.subscribe<sensor_msgs::LaserScan>("/scan", 10, laserCallback);
 
     ros::Rate rate(2);
     while (nh.ok()) {
