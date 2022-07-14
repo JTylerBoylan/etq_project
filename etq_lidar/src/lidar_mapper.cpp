@@ -67,10 +67,17 @@ namespace etq_lidar {
             !_map->getIndex(grid_map::Position(point.x(), point.y()), idx))
             return;
 
-        float *elevation = &(_map->at("elevation", idx));
+        float * elevation;
+        for (auto iter = grid_map::LineIterator(*_map, odx, idx); !iter.isPastEnd(); ++iter) {
+            elevation = &(_map->at("elevation", *iter));
+            if (isnanf(*elevation))
+                *elevation = 0.0; // Replace with ground plane
+        }
+            
+
         if (*elevation < point.z())
             *elevation = point.z();
-        
+
     } /* _add_to_grid */
 
 } /* namespace */

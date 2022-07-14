@@ -35,7 +35,7 @@ int main (int argc, char** argv) {
         pose_pub.publish(pose);
     };
 
-    ros::Subscriber imu_sub = node.subscribe<sensor_msgs::Imu>("etq/imu/data", 1, imuCallback);
+    ros::Subscriber imu_sub = node.subscribe<sensor_msgs::Imu>("imu/data", 1, imuCallback);
 
     ros::spin();
 }

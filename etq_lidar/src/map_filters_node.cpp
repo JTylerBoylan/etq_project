@@ -1,4 +1,4 @@
-#include <filters/filter_chain.h>
+#include <filters/filter_chain.hpp>
 #include <grid_map_core/grid_map_core.hpp>
 #include <grid_map_ros/grid_map_ros.hpp>
 #include <grid_map_msgs/GridMap.h>
@@ -14,25 +14,11 @@ int main (int argc, char ** argv) {
   filters::FilterChain<grid_map::GridMap> filterChain("grid_map::GridMap");
   if (!filterChain.configure("grid_map_filters", node)) {
     ROS_ERROR("Could not configure the filter chain!");
-    return;
+    return 0;
   }
   
-  GridMap map_out({"elevation",
-              "elevation_inpainted",
-              "elevation_smooth",
-              "normal_x",
-              "normal_y",
-              "normal_z",
-              "slope",
-              "roughness",
-              "edges",
-              "traversability"
-              });
-  
-  map_out.setFrameId("world");
-  map_out.setGeometry(grid_map::Length(5,5), 0.0625, grid_map::Position(0,0));
-  
   GridMap map_in;
+  GridMap map_out;
   
   auto mapCallback = [&](const grid_map_msgs::GridMapConstPtr &msg) {
     GridMapRosConverter::fromMessage(*msg, map_in);
@@ -53,6 +39,8 @@ int main (int argc, char ** argv) {
     grid_map_msgs::GridMap msg;
     GridMapRosConverter::toMessage(map_out, msg);
     map_pub.publish(msg);
+
+    ROS_INFO("Filtered Map published. (Timestamp: %.5f)", msg.info.header.stamp.toSec());
     
     ros::spinOnce();
     rate.sleep();

@@ -17,14 +17,28 @@ int main(int argc, char ** argv) {
     sensor_msgs::LaserScan latest_scan;
 
     grid_map::GridMap map({"elevation"});
+
+/*
+              "elevation_inpainted",
+              "elevation_smooth",
+              "normal_x",
+              "normal_y",
+              "normal_z",
+              "slope",
+              "roughness",
+              "edges",
+              "traversability"
+              });
+*/
     
     map.setFrameId("world");
-    map.setGeometry(grid_map::Length(5,5), 0.0625, grid_map::Position(0,0));
+    map.setGeometry(grid_map::Length(7.5,7.5), 0.0625, grid_map::Position(0,0));
 
     ETQLidarMap lidar(map);
 
     auto poseCallback = [&](const geometry_msgs::PoseStampedConstPtr &msg) {
         latest_pose = msg->pose;
+        ROS_INFO("Pose updated");
     };
 
     int seq = 0;

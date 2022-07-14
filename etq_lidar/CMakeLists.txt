@@ -30,5 +30,8 @@ target_link_libraries(lidar_projection ${catkin_LIBRARIES} ${PROJECT_NAME})
 add_executable(pose_estimation src/pose_estimation_node.cpp)
 target_link_libraries(pose_estimation ${catkin_LIBRARIES} ${PROJECT_NAME})
 
+add_executable(map_filters src/map_filters_node.cpp)
+target_link_libraries(map_filters ${catkin_LIBRARIES} ${PROJECT_NAME})
+
 add_executable(world2lidar_transform src/world2lidar_tf_node.cpp)
 target_link_libraries(world2lidar_transform ${catkin_LIBRARIES} ${PROJECT_NAME})
