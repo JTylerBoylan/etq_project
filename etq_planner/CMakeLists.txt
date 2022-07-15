@@ -25,5 +25,5 @@ add_library(${PROJECT_NAME}
   src/astar_planner.cpp
 )
 
-add_executable(local_planner src/local_planner.cpp)
+add_executable(local_planner src/local_planner_node.cpp)
 target_link_libraries(local_planner ${catkin_LIBRARIES} ${PROJECT_NAME})
