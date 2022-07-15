@@ -5,14 +5,16 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   grid_map_ros
+  grid_map_filters
+  grid_map_cv
+  filters
   roscpp
-  laser_geometry
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES etq_lidar
-  CATKIN_DEPENDS grid_map_ros roscpp
+  CATKIN_DEPENDS grid_map_ros roscpp grid_map_filters filters grid_map_cv
 )
 
 include_directories(

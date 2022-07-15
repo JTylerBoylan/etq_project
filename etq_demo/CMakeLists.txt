@@ -6,14 +6,12 @@ project(etq_demo)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   grid_map_ros
-  etq_planner
-  geometry_msgs
 )
 
 
 catkin_package(
 #  INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp grid_map_ros etq_planner
+  CATKIN_DEPENDS roscpp grid_map_ros
 )
 
 include_directories(
