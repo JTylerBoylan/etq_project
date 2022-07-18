@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(etq_lidar)
 
 add_compile_options(-std=c++11)
+add_compile_options(-ffast-math -fno-finite-math-only)
 
 find_package(catkin REQUIRED COMPONENTS
   grid_map_ros
@@ -24,6 +25,7 @@ include_directories(
 
 add_library(${PROJECT_NAME}
   src/lidar_mapper.cpp
+  src/SignedDistanceFieldFilter.cpp
 )
 
 add_executable(lidar_projection src/lidar_projection_node.cpp)

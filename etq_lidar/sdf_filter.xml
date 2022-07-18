@@ -1,0 +1,10 @@
+<class_libraries>
+    <library path="lib/libetq_lidar">
+        <class name="gridMapFilters/SignedDistanceFieldFilter" type="grid_map::SignedDistanceFieldFilter" 
+                base_class_type="filters::FilterBase<grid_map::GridMap>">
+            <description>
+                Computes a signed distance field given a boolean traversability layer.
+            </description>
+        </class>
+    </library>
+</class_libraries>

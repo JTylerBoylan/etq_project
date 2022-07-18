@@ -96,4 +96,10 @@ grid_map_filters:
       condition_layer: traversable
       output_layer: traversable
       upper_threshold: 1.0
-      set_to: 1.0 # Other uses: .nan, .inf
+      set_to: .inf # Other uses: .nan, .inf
+
+  - name: signed_distance_field
+    type: gridMapFilters/SignedDistanceFieldFilter
+    params:
+      input_layer: traversable
+      output_layer: sdf
