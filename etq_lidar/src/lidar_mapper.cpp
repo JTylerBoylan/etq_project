@@ -8,8 +8,9 @@ namespace etq_lidar {
         _map = &map;
 
         // Origin
-        _origin << Vector3f::Zero();
+        _origin = Vector3f::Zero();
         _rotation = Quaternionf::Identity();
+        _gnd << 0, 0, 1, 0, 0, 0;
 
     }
 
@@ -70,8 +71,10 @@ namespace etq_lidar {
         float * elevation;
         for (auto iter = grid_map::LineIterator(*_map, odx, idx); !iter.isPastEnd(); ++iter) {
             elevation = &(_map->at("elevation", *iter));
-            if (isnanf(*elevation))
-                *elevation = 0.0; // Replace with ground plane
+            if (isnanf(*elevation)) {
+                grid_map::Position pos = _map->getPosition(*iter);
+                *elevation = _gnd[5] - (_gnd[0]*(pos.x() - _gnd[3]) + _gnd[1]*(pos.y() - _gnd[4])) / _gnd[2];
+            }
         }
             
 
