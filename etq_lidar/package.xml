@@ -30,6 +30,6 @@
 
 
   <export>
-    <filters plugin="${prefix}/sdf_filter.xml" />
+    <filters plugin="${prefix}/df_filter.xml" />
   </export>
 </package>
