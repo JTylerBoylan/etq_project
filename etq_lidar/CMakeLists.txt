@@ -25,7 +25,7 @@ include_directories(
 
 add_library(${PROJECT_NAME}
   src/lidar_mapper.cpp
-  src/SignedDistanceFieldFilter.cpp
+  src/DistanceField2DFilter.cpp
 )
 
 add_executable(lidar_projection src/lidar_projection_node.cpp)
