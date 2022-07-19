@@ -25,9 +25,9 @@ namespace grid_map {
 
             std::string outputLayer_;
 
-            void distance_transform_2D(Matrix& sedt);
+            Matrix& distance_transform_2D(const Matrix& grid);
 
-            void distance_transform_1D(Matrix& sedt, int row);
+            Matrix& distance_transform_1D(const Matrix& grid, int row);
 
     };
 
