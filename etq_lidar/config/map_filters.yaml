@@ -84,7 +84,7 @@ grid_map_filters:
 
   # Compute 2D distance field
   - name: signed_distance_field
-    type: gridMapFilters/SignedDistanceFieldFilter
+    type: gridMapFilters/DistanceField2DFilter
     params:
       input_layer: traversable
       output_layer: sdf
