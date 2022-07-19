@@ -29,68 +29,64 @@ namespace grid_map {
         mapOut = mapIn;
         mapOut.add(outputLayer_);
 
-        mapOut[outputLayer_] = distance_transform_2D(mapIn[inputLayer_]);
+        mapOut[outputLayer_] = mapIn[inputLayer_];
+
+        distance_transform_2D(mapOut[outputLayer_]);
 
         return true;
     }
 
-    Matrix& DistanceField2DFilter::distance_transform_2D(const Matrix& grid) {
-
-        Matrix Df = grid;
+    void DistanceField2DFilter::distance_transform_2D(Matrix& grid) {
         
         for (int r = 0; r < grid.rows(); r++)
-            Df = distance_transform_1D(Df, r);
+            distance_transform_1D(grid, r);
         
-        Df.transposeInPlace();
+        grid.transposeInPlace();
         
         for (int r = 0; r < grid.cols(); r++)
-            Df = distance_transform_1D(Df, r);
+            distance_transform_1D(grid, r);
 
-        Df.transposeInPlace();
+        grid.transposeInPlace();
 
-        Df = Df.cwiseSqrt();
+        grid = grid.cwiseSqrt();
 
-        return Df;
     }
 
-    Matrix& DistanceField2DFilter::distance_transform_1D(const Matrix& ref, int row) {
+    void DistanceField2DFilter::distance_transform_1D(Matrix& grid, int row) {
 
-        Matrix Df = ref;
+        int row_size = grid.row(row).size();
         
-        int row_size = ref.row(row).size();
-        
-        float v[row_size], z[row_size];
-        int k = 1;
+        int v[row_size+1], z[row_size+1];
 
         v[0] = 0;
-        z[0] = -INFINITY;
-        z[1] = INFINITY;
+        z[0] = -1000000000;
+        z[1] = +1000000000;
 
-
-        for (int q = 1; q < row_size; q++) {
+        for (int q = 1, k = 0, s = 0; q < row_size; q++) {
             
-            float s;
             do {
-                k--;
-                s = ((ref(row,q) + q*q) - (ref(row, v[k]) + v[k]*v[k])) / (2*q - 2*v[k]);
-            } while (s <= z[k]);
+                const int r = v[k];
+                s = (grid(row,q) - grid(row,r) + q*q - r*r) / (q-r) / 2;
+            } while (s <= z[k--]);
             
-            k++;
+            k += 2;
             v[k] = q;
             z[k] = s;
-            z[k+1] = INFINITY;
+            z[k+1] = +1000000000;
+
         }
         
-        k = 0;
-        for (int q = 0; q < row_size; q++) {
+        for (int q = 0, k = 0; q < row_size; q++) {
             
             while (z[k+1] < q) k++;
-            
-            Df(row, q) = (q - v[k])*(q - v[k]) + ref(row, v[k]);
+
+            const int r = v[k];
+
+            grid(row, q) = grid(row,r) + (q - r) * (q - r);
             
         }
+
         
-        return Df;
     }
 
 }

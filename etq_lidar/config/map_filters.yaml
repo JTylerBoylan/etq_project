@@ -80,7 +80,7 @@ grid_map_filters:
       condition_layer: traversable
       output_layer: traversable
       upper_threshold: 0.0
-      set_to: .inf
+      set_to: 1000000000.0
 
   # Compute 2D distance field
   - name: distance_field
@@ -94,4 +94,4 @@ grid_map_filters:
     type: gridMapFilters/MathExpressionFilter
     params:
       output_layer: cost_map
-      expression: (1.0 / distance_field) + 2.0 * (1 - traversability)
+      expression: (1.0 / distance_field) + (1 - traversability)

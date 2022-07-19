@@ -98,10 +98,10 @@ Visualization Manager:
       Autocompute Intensity Bounds: true
       Class: grid_map_rviz_plugin/GridMap
       Color: 200; 200; 200
-      Color Layer: sdf
-      Color Transformer: GridMapLayer
+      Color Layer: cost_map
+      Color Transformer: ""
       Enabled: true
-      Height Layer: traversable
+      Height Layer: elevation_inpainted
       Height Transformer: GridMapLayer
       History Length: 1
       Invert Rainbow: false
@@ -143,7 +143,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.60094928741455
+      Distance: 13.816436767578125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -159,9 +159,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0.9747962951660156
       Target Frame: <Fixed Frame>
-      Yaw: 3.9235823154449463
+      Yaw: 5.208583354949951
     Saved: ~
 Window Geometry:
   Displays:

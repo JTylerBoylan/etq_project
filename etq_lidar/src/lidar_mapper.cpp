@@ -72,8 +72,9 @@ namespace etq_lidar {
         for (auto iter = grid_map::LineIterator(*_map, odx, idx); !iter.isPastEnd(); ++iter) {
             elevation = &(_map->at("elevation", *iter));
             if (isnanf(*elevation)) {
-                grid_map::Position pos = _map->getPosition(*iter);
-                *elevation = _gnd[5] - (_gnd[0]*(pos.x() - _gnd[3]) + _gnd[1]*(pos.y() - _gnd[4])) / _gnd[2];
+                grid_map::Position pos;
+                if(_map->getPosition(*iter, pos))
+                    *elevation = _gnd[5] - (_gnd[0]*(pos.x() - _gnd[3]) + _gnd[1]*(pos.y() - _gnd[4])) / _gnd[2];
             }
         }
             
