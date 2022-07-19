@@ -1,9 +1,9 @@
 <class_libraries>
     <library path="lib/libetq_lidar">
-        <class name="gridMapFilters/SignedDistanceFieldFilter" type="grid_map::SignedDistanceFieldFilter" 
+        <class name="gridMapFilters/DistanceField2DFilter" type="grid_map::DistanceField2DFilter" 
                 base_class_type="filters::FilterBase<grid_map::GridMap>">
             <description>
-                Computes a signed distance field given a boolean traversability layer.
+                Computes a 2D distance field given a boolean traversability layer.
             </description>
         </class>
     </library>
