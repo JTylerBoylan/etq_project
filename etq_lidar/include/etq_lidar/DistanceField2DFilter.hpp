@@ -7,13 +7,13 @@
 
 namespace grid_map {
 
-    class SignedDistanceFieldFilter : public filters::FilterBase<GridMap> {
+    class DistanceField2DFilter : public filters::FilterBase<GridMap> {
 
         public:
 
-            SignedDistanceFieldFilter();
+            DistanceField2DFilter();
 
-            ~SignedDistanceFieldFilter() override;
+            ~DistanceField2DFilter() override;
 
             bool configure() override;
 
@@ -25,9 +25,9 @@ namespace grid_map {
 
             std::string outputLayer_;
 
-            void compute_edt(Matrix& sedt);
+            void distance_transform_2D(Matrix& sedt);
 
-            void horizontal_pass(Matrix& sedt, int row);
+            void distance_transform_1D(Matrix& sedt, int row);
 
     };
 
