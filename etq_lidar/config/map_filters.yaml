@@ -83,8 +83,8 @@ grid_map_filters:
       set_to: .inf
 
   # Compute 2D distance field
-  - name: signed_distance_field
+  - name: distance_field
     type: gridMapFilters/DistanceField2DFilter
     params:
       input_layer: traversable
-      output_layer: sdf
+      output_layer: distance_field
