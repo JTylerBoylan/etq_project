@@ -29,11 +29,12 @@ namespace grid_map {
         mapOut = mapIn;
         mapOut.add(outputLayer_);
 
-        Matrix field = mapIn[inputLayer_];
+        Matrix field_in = mapOut[inputLayer_];
+        Matrix& field_out = mapOut[outputLayer_];
 
-        compute_edt(field);
+        field_out = field_in;
 
-        mapOut[outputLayer_] = field;
+        compute_edt(field_out);
 
         return true;
     }
@@ -43,14 +44,14 @@ namespace grid_map {
         for (int r = 0; r < sedt.rows(); r++)
             horizontal_pass(sedt, r);
 
-        sedt.transpose();
+        sedt.transposeInPlace();
 
-        for (int r = 0; r < sedt.rows(); r++)
-            horizontal_pass(sedt, r);
+        //for (int r = 0; r < sedt.rows(); r++)
+            //horizontal_pass(sedt, r);
 
-        sedt.transpose();
+        //sedt.transposeInPlace();
 
-        sedt.cwiseSqrt();
+        //sedt = sedt.cwiseSqrt();
 
     }
 
@@ -69,17 +70,17 @@ namespace grid_map {
 
         for (int i = 1; i < row_size; i++) {
 
-            Eigen::Vector2f q(i, sedt(row,i)), p;
-            float s, n, d;
+            Eigen::Vector2f q(i, sedt(row,i));
+            Eigen::Vector2f p = hull_vertices.col(k);
+            float s = ((q.y() + q.x()*q.x()) - (p.y() + p.x()*p.x())) / (2*q.x() - 2*p.x());
 
-            do {
+            while (s <= hull_intersections(0,k)) {
+                k--;
                 p = hull_vertices.col(k);
-                n = (q.y() + q.x()*q.x()) - (p.y() + p.x()*p.x());
-                d = 2*q.x() - 2*p.x();
-                s = d == 0 ? INFINITY : n / d;
-            } while(s <= hull_intersections(k--, 0));
+                s = ((q.y() + q.x()*q.x()) - (p.y() + p.x()*p.x())) / (2*q.x() - 2*p.x());
+            }
 
-            k += 2;
+            k += 1;
 
             hull_vertices.col(k) = q;
 

@@ -57,47 +57,32 @@ grid_map_filters:
     type: gridMapFilters/MathExpressionFilter
     params:
       output_layer: traversability
-      expression: 1.0 - 0.5 * (1.0 - (slope / 0.6)) - 0.5 * (1.0 - (roughness / 0.1))
+      expression: 0.5 * (1.0 - (slope / 0.6)) + 0.5 * (1.0 - (roughness / 0.1))
 
-  # Set lower threshold on traversability
-  - name: traversability_lower_threshold
-    type: gridMapFilters/ThresholdFilter
-    params:
-      condition_layer: traversability
-      output_layer: traversability
-      lower_threshold: 0.0
-      set_to: 0.0
-
-  # Set upper threshold on traversability
-  - name: traversability_upper_threshold
-    type: gridMapFilters/ThresholdFilter
-    params:
-      condition_layer: traversability
-      output_layer: traversability
-      upper_threshold: 1.0
-      set_to: 1.0 # Other uses: .nan, .inf
-
-  # Make binary occupancy grid
+  # Duplicate traversability layer
   - name: traversable
     type: gridMapFilters/DuplicationFilter
     params:
       input_layer: traversability
       output_layer: traversable
+
+  # Convert to boolean occupancy grid
   - name: traversable_lower_threshold
     type: gridMapFilters/ThresholdFilter
     params:
       condition_layer: traversable
       output_layer: traversable
-      lower_threshold: 1.0
+      lower_threshold: 0.0
       set_to: 0.0
   - name: traversable_upper_threshold
     type: gridMapFilters/ThresholdFilter
     params:
       condition_layer: traversable
       output_layer: traversable
-      upper_threshold: 1.0
-      set_to: .inf # Other uses: .nan, .inf
+      upper_threshold: 0.0
+      set_to: .inf
 
+  # Compute 2D distance field
   - name: signed_distance_field
     type: gridMapFilters/SignedDistanceFieldFilter
     params:
