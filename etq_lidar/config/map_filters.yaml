@@ -88,3 +88,10 @@ grid_map_filters:
     params:
       input_layer: traversable
       output_layer: distance_field
+      
+  # Compute cost map from traversability and distance field
+  - name: cost_map
+    type: gridMapFilters/MathExpressionFilter
+    params:
+      output_layer: cost_map
+      expression: (1.0 / distance_field) + 2.0 * (1 - traversability)
