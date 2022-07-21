@@ -76,11 +76,8 @@ namespace etq_planner
         // Store grid map for planner
         const GridMap * _grid;
 
-        // Store the start pose of the planner
-        Pose _start;
-
-        // Store the goal point of the planner
-        Point _goal;
+        // Store the goal point of the planner as a vector
+        Eigen::Vector2d _goal;
 
         // Store the index of the best node
         int _best;
@@ -96,21 +93,6 @@ namespace etq_planner
 
         // Heuristic function for a node
         float _h(const Node& node);
-
-        // F score of node
-        float _f(const Node& node);
-
-        // Determine if node is in goal region
-        bool _in_goal_region(const Node& node);
-
-        // Determine if node is in valid position
-        bool _is_valid(const Node& node);
-
-        // Get velocity of node
-        float _vel(const Node& node, const int n);
-
-        // Get rotational velocity of node
-        float _rot(const Node& node, const int n);
 
         // Convert node to pose
         geometry_msgs::Pose _node2pose(const Node& node);
