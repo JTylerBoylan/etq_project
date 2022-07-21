@@ -1,0 +1,12 @@
+max_iterations: 1000
+max_generations: 5
+goal_radius: 1.0
+sample_time: 1.0
+sample_delta_time: 0.1
+cost_per_unit_time: 1.0
+cost_per_unit_deltav: 0.25
+cost_per_unit_deltau: 0.25
+cost_per_unit_head: 1.0
+sample_size: 6
+sample_velocities: [-0.5, 1.0, 1.0, 1.0, 1.0, 1.0]
+sample_rotations: [0, 0.393, 0.196, 0, -0.196, -0.393]
