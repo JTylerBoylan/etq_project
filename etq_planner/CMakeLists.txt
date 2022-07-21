@@ -22,7 +22,7 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-  src/astar_planner.cpp
+  src/ETQLocalPlanner.cpp
 )
 
 add_executable(local_planner src/local_planner_node.cpp)
