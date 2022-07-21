@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include <etq_planner/ETQPlanner.hpp>
+#include <etq_planner/ETQLocalPlanner.hpp>
 #include <grid_map_msgs/GridMap.h>
 #include <grid_map_ros/GridMapRosConverter.hpp>
 #include <geometry_msgs/PoseStamped.h>
@@ -18,7 +18,7 @@ int main (int argc, char **argv) {
     Pose start;
     Point goal;
 
-    ETQPlanner planner(LOCAL);
+    ETQLocalPlanner planner(nh);
 
     auto mapUpdate = [&](const grid_map_msgs::GridMap::ConstPtr& grid_msg) {
         GridMapRosConverter::fromMessage(*grid_msg, grid);
