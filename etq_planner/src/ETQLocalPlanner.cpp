@@ -1,7 +1,4 @@
 #include <etq_planner/ETQLocalPlanner.hpp>
-#include <algorithm>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2/LinearMath/Matrix3x3.h>
 
 namespace etq_planner 
 {
@@ -32,6 +29,9 @@ namespace etq_planner
 
 	if (!node_handle.getParam("cost_per_unit_deltau", _cost_delta_u))
 		_cost_delta_u = DEFAULT_COST_DELTA_U;
+	    
+	if (!node_handle.getParam("cost_per_unit_head", _cost_head))
+		_cost_head = DEFAULT_COST_HEAD;
 
 	if (!node_handle.getParam("sample_size", _sample_size))
 		_sample_size = DEFAULT_SAMPLE_SIZE;
@@ -72,12 +72,6 @@ namespace etq_planner
 
         std::priority_queue<int, std::vector<int>, const std::function<bool(int&, int&)>> queue = std::priority_queue<int, std::vector<int>, const std::function<bool(int&, int&)>>(comp); 
         
-        // Quaternion -> Euler Angles
-        tf2::Quaternion q(start.orientation.x, start.orientation.y, start.orientation.z, start.orientation.w);
-        tf2::Matrix3x3 mat(q);
-        tf2:tf2Scalar a,b,c;
-        mat.getEulerYPR(a, b, c);
-        
         // Create start node
         Node start_node;
         start_node.i = 0;
@@ -85,10 +79,7 @@ namespace etq_planner
         start_node.t = 0;
         start_node.x = (float) start.position.x;
         start_node.y = (float) start.position.y;
-        start_node.z = (float) start.position.z;
-        start_node.a = a;
-        start_node.b = b;
-        start_node.c = c;
+        start_node.w = 2.0f * atan2f(Eigen::Vector3d(start.orientation.x, start.orientation.y, start.orientation.z).normal(), start.orientation.w);
         start_node.v = 0.0f;
         start_node.u = 0.0f;
         start_node.g = 0.0f;
@@ -96,7 +87,7 @@ namespace etq_planner
 
         _buffer[0] = start_node;
 	
-	    queue.push(0);
+	queue.push(0);
 
         // Iteration Loop
         while (!queue.empty() && _iter < _max_iterations) {
@@ -163,8 +154,6 @@ namespace etq_planner
 
     // Generate sample path from node
     void ETQLocalPlanner::_sample(const Node& _node, const int n, int& buf) {
-
-        const float map_resolution = _grid->getResolution();
         
         // Calculate index in buffer
         buf = _iter*_sample_size + n + 1;
@@ -186,44 +175,30 @@ namespace etq_planner
         while (t < _sample_time) {
 
             // New Yaw
-            node.a += node.u * _sample_delta_time;
+            node.w += node.u * _sample_delta_time;
             
-            // Get heading direction
-            Eigen::Vector2d heading(cos(node.a), sin(node.a));
+            // Get velocity vector
+            Eigen::Vector2f velocity(node.v * cosf(node.w), node.v * sinf(node.w));
             
             // New Position                   
-            node.x += heading.x() * node.v * _sample_delta_time;
-            node.y += heading.y() * node.v * _sample_delta_time;
+            node.x += velocity.x() * _sample_delta_time;
+            node.y += velocity.y() * _sample_delta_time;
+		
+	    // Grid map position
+	    Position position(node.x, node.y);
+		
+	    // Get normal vector
+	    Eigen::Vector2f normal(_grid->atPosition("normal_x", position), _grid->atPosition("normal_y", position));
+		
+            // Get heading dot product
+	    float head = abs(normal.x() * velocity.x() + normal.y() * velocity.y());
 
-            // Bounds check
-            Position pos = Position(node.x, node.y);
-            if(!_grid->isInside(pos)) {
-                buf = 0;
-                return;
-            }
-            
-            // Get new elevation
-            node.z = _grid->atPosition("elevation", pos) + ETQ_HEIGHT;
-            
-            // Calculate pitch
-            Position pos_med = pos + heading * map_resolution;
-            if (_grid->isInside(pos_med)) {
-                float z_med = _grid->atPosition("elevation", pos_med) + ETQ_HEIGHT;
-                node.b = -atanf((node.z - z_med) / map_resolution);
-            }
-            
-            // Calculate roll
-            Position pos_lat = pos + Eigen::Vector2d(-sin(node.a), cos(node.a)) * map_resolution;
-            if (_grid->isInside(pos_lat)) {
-                float z_lat = _grid->atPosition("elevation", pos_lat) + ETQ_HEIGHT;
-                node.c = atanf((z_lat - node.z) / map_resolution);
-            }
-            
-            if (!_is_valid(node)) {
-                buf = 0;
-                return;
-            }
-
+            // Add cost from heading
+	    node.g += head * _cost_head;
+		
+	    // Add cost from cost map
+	    node.g += _grid->atPosition("cost_map", position) * node.v * _sample_delta_time;
+		
             // Increment
             t += _sample_delta_time;
 
@@ -232,10 +207,14 @@ namespace etq_planner
         // Yaw angle wrapping
         if (node.a > 2.0*M_PI || node.a < 0)
            node.a += node.a > 2.0*M_PI ? -2.0f*M_PI : 2.0f*M_PI;
-
-        // Add to g score
-        node.g += _g(node);
-
+	    
+	// Add cost from time
+	node.g += _cost_time * _sample_time;
+	    
+	// Add cost from delta V and delta U
+	node.g += _cost_delta_v * (node.v - _node.v);
+	node.g += _cost_delta_u * (node.u - _node.u);
+	    
         // Recalculate f score
         node.f = _f(node);
 
@@ -249,24 +228,15 @@ namespace etq_planner
         float dx, dy, dw;
         dx = _goal.x - node.x;
         dy = _goal.y - node.y;
-        dw = atan2f(dy,dx) - node.a;
+        dw = atan2f(dy,dx) - node.w;
         if (dw > M_PI || dw < -M_PI)
             dw += dw > M_PI ? -2.0f*M_PI : 2.0f*M_PI;
         return sqrtf(dx*dx + dy*dy)/V_MAX + abs(dw)/U_MAX;
     }
 
     // F score of a node
-    // Returns: f score = distance from goal cost + time cost
     float ETQLocalPlanner::_f(const Node& node) {
         return _h(node) + node.g;
-    }
-
-    // G score of node
-    float ETQLocalPlanner::_g(const Node& node) {
-        // Fix this to include cost map
-        return _cost_time * _sample_delta_time 
-            + _cost_delta_v * abs(node.v - _buffer[node.p].v) 
-            + _cost_delta_u * abs(node.u - _buffer[node.p].u);
     }
 
     // Determine if node is in goal region
@@ -278,13 +248,11 @@ namespace etq_planner
 
     // Determine if node is in valid position
     bool ETQLocalPlanner::_is_valid(const Node& node) {
-        // Remove this?
-        return true;
+        return _grid->atPosition("traversable", Position(node.x, node.y)) != 0;
     }
 
     // Get velocity of node
     float ETQLocalPlanner::_vel(const Node& node, const int n) {
-        // return _vel_lookup[n] * (1 - node.b / MAX_PITCH) * (1 - node.c / MAX_ROLL);
         return _velocity_lookup[n];
     }
 
@@ -297,15 +265,17 @@ namespace etq_planner
     geometry_msgs::Pose ETQLocalPlanner::_node2pose(const Node& node) {
         geometry_msgs::Pose p;
         Position pos = {node.x, node.y};
+	    
         p.position.x = node.x;
         p.position.y = node.y;
-        p.position.z = node.z;
-        tf2::Quaternion q;
-        q.setRPY(node.c, node.b, node.a);
-        p.orientation.x = q.getX();
-        p.orientation.y = q.getY();
-        p.orientation.z = q.getZ();
-        p.orientation.w = q.getW();
+        p.position.z = _grid->atPosition("elevation", pos);
+	
+	double sin_w2 = sin(node.w / 2.0);
+        p.orientation.x = _grid->atPosition("normal_x", pos) * sin_w2;
+        p.orientation.y = _grid->atPosition("normal_y", pos) * sin_w2;
+        p.orientation.z = _grid->atPosition("normal_z", pos) * sin_w2;
+        p.orientation.w = cos(node.w / 2.0);
+	    
         return p;
     }
 
