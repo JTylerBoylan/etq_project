@@ -1,8 +1,6 @@
 #ifndef ETQ_PLANNER_HPP
 #define ETQ_PLANNER_HPP
 
-#include <etq_planner/etq_definitions.hpp>
-
 #include <ros/ros.h>
 #include <grid_map_core/GridMap.hpp>
 #include <geometry_msgs/PoseArray.h>
