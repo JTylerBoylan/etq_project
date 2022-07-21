@@ -10,3 +10,5 @@ cost_per_unit_head: 1.0
 sample_size: 6
 sample_velocities: [-0.5, 1.0, 1.0, 1.0, 1.0, 1.0]
 sample_rotations: [0, 0.393, 0.196, 0, -0.196, -0.393]
+max_velocity: 1.0
+max_rotation: 0.393

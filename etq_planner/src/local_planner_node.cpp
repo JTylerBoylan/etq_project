@@ -11,7 +11,7 @@ using namespace grid_map;
 int main (int argc, char **argv) {
 
     ros::init(argc, argv, "local_planner");
-    ros::NodeHandle nh;
+    ros::NodeHandle nh("~");
 
     GridMap grid;
 
@@ -54,7 +54,7 @@ int main (int argc, char **argv) {
 
         cstart = clock();
 
-        ETQPlanner::RunInfo info = planner.run(grid, start, goal);
+        ETQLocalPlanner::RunInfo info = planner.run(grid, start, goal);
 
         cend = clock();
 

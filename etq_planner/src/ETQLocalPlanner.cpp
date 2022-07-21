@@ -46,11 +46,13 @@ namespace etq_planner
 
 	if (_velocity_lookup.size() != _sample_size || _rotation_lookup.size() != _sample_size)
 		ROS_WARN("Mismatch of sample size and sample array size:\nsample_size: %i\nsample_velocities (size): %i\nsample_rotations (size): %i", 
-            _sample_size, _velocity_lookup.size(), _rotation_lookup.size());
+            _sample_size, int(_velocity_lookup.size()), int(_rotation_lookup.size()));
 	    
-	// Grab max velocity and min rotation from array
-	_max_velocity = max(_velocity_lookup);
-	_max_rotation = max(_rotation_lookup);
+    if (!node_handle.getParam("max_velocity", _max_velocity))
+		ROS_ERROR("Missing parameter: max_velocity");
+
+    if (!node_handle.getParam("max_rotation", _max_rotation))
+		ROS_ERROR("Missing parameter: max_rotation");
 
 	// Initialize Node buffer
         _buffer = new Node[_max_iterations*_sample_size + 1];
@@ -65,7 +67,7 @@ namespace etq_planner
 
         // Set the class variables
         _grid = &grid;
-        _goal = Vector2d(goal.x, goal.y);
+        _goal = Eigen::Vector2d(goal.x, goal.y);
 
         _iter = 0;
         _high = 0;
@@ -84,15 +86,15 @@ namespace etq_planner
         start_node.t = 0;
         start_node.x = (float) start.position.x;
         start_node.y = (float) start.position.y;
-        start_node.w = 2.0f * atan2f(Eigen::Vector3d(start.orientation.x, start.orientation.y, start.orientation.z).normal(), start.orientation.w);
+        start_node.w = 2.0f * atan2f(Eigen::Vector3f(start.orientation.x, start.orientation.y, start.orientation.z).norm(), start.orientation.w);
         start_node.v = 0.0f;
         start_node.u = 0.0f;
         start_node.g = 0.0f;
-        start_node.f = _f(start_node);
+        start_node.f = _h(start_node);
 
         _buffer[0] = start_node;
 	
-	queue.push(0);
+	    queue.push(0);
 
         // Iteration Loop
         while (!queue.empty() && _iter < _max_iterations) {
@@ -102,18 +104,24 @@ namespace etq_planner
             queue.pop();
 
             Node node = _buffer[_best];
-		
-	    Position position(node.x, node.y);
-		
-	    // Bounds check
-	    if (!_grid->isInside(position))
-		break;
             
+            Position position(node.x, node.y);
+
+            ROS_INFO("A");
+            
+            // Bounds check
+            if (!_grid->isInside(position))
+                break;
+
+            ROS_INFO("B");
+                
             // Goal check
-	    if ((_goal - position).normal() <= _goal_radius) {
+            if ((_goal - position).norm() <= _goal_radius) {
                 _path_found = true;
                 break;
             }
+
+            ROS_INFO("C");
             
             //  Generation check
             if (node.t > _max_generations)
@@ -151,7 +159,7 @@ namespace etq_planner
         // Back propogate
         for (int i = _best; i != -1; i = _buffer[i].p) {
             arr_msg.poses.push_back(_node2pose(_buffer[i]));
-            //ROS_INFO("i: %d , z: %.2f, pitch: %.2f, roll: %.2f", i, _buffer[i].z, _buffer[i].b, _buffer[i].c);
+            ROS_INFO("i: %d , x: %.2f, y: %.2f, w: %.2f", i, _buffer[i].x, _buffer[i].y, _buffer[i].w);
         }
     }
 
@@ -195,23 +203,24 @@ namespace etq_planner
             node.x += velocity.x() * _sample_delta_time;
             node.y += velocity.y() * _sample_delta_time;
 		
-	    // Grid map position
-	    Position position(node.x, node.y);
-		
-	    if (_grid->atPosition("traversable", position) == 0)
-	    	break;
-		
-	    // Get normal vector
-	    Eigen::Vector2f normal(_grid->atPosition("normal_x", position), _grid->atPosition("normal_y", position));
-		
+            // Grid map position
+            Position position(node.x, node.y);
+
+            // Obstacle check
+            if (_grid->atPosition("traversable", position) == 0)
+                break;
+
+            // Get normal vector
+            Eigen::Vector2f normal(_grid->atPosition("normal_x", position), _grid->atPosition("normal_y", position));
+            
             // Get heading dot product
-	    float head = abs(normal.x() * velocity.x() + normal.y() * velocity.y());
+            float head = abs(normal.x() * velocity.x() + normal.y() * velocity.y());
 
             // Add cost from heading
-	    node.g += head * _cost_head;
-		
-	    // Add cost from cost map
-	    node.g += _grid->atPosition("cost_map", position) * node.v * _sample_delta_time;
+            node.g += head * _cost_head;
+            
+            // Add cost from cost map
+            node.g += _grid->atPosition("cost_map", position) * node.v * _sample_delta_time;
 		
             // Increment
             t += _sample_delta_time;
@@ -219,15 +228,15 @@ namespace etq_planner
         }
         
         // Yaw angle wrapping
-        if (node.a > 2.0*M_PI || node.a < 0)
-           node.a += node.a > 2.0*M_PI ? -2.0f*M_PI : 2.0f*M_PI;
+        if (node.w > 2.0*M_PI || node.w < 0)
+           node.w += node.w > 2.0*M_PI ? -2.0f*M_PI : 2.0f*M_PI;
 	    
-	// Add cost from time
-	node.g += _cost_time * _sample_time;
-	    
-	// Add cost from delta V and delta U
-	node.g += _cost_delta_v * (node.v - _node.v);
-	node.g += _cost_delta_u * (node.u - _node.u);
+        // Add cost from time
+        node.g += _cost_time * _sample_time;
+            
+        // Add cost from delta V and delta U
+        node.g += _cost_delta_v * (node.v - _node.v);
+        node.g += _cost_delta_u * (node.u - _node.u);
 	    
         // Recalculate f score
         node.f =_h(node) + node.g;
@@ -240,8 +249,8 @@ namespace etq_planner
     // Heuristic function for a pose
     float ETQLocalPlanner::_h(const Node& node) {
         float dx, dy, dw;
-        dx = _goal.x - node.x;
-        dy = _goal.y - node.y;
+        dx = _goal.x() - node.x;
+        dy = _goal.y() - node.y;
         dw = atan2f(dy,dx) - node.w;
         if (dw > M_PI || dw < -M_PI)
             dw += dw > M_PI ? -2.0f*M_PI : 2.0f*M_PI;
@@ -257,7 +266,7 @@ namespace etq_planner
         p.position.y = node.y;
         p.position.z = _grid->atPosition("elevation", pos);
 	
-	double sin_w2 = sin(node.w / 2.0);
+	    double sin_w2 = sin(node.w / 2.0);
         p.orientation.x = _grid->atPosition("normal_x", pos) * sin_w2;
         p.orientation.y = _grid->atPosition("normal_y", pos) * sin_w2;
         p.orientation.z = _grid->atPosition("normal_z", pos) * sin_w2;

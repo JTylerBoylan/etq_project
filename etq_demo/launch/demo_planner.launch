@@ -8,8 +8,12 @@
 
   <node name="lidar_projection" pkg="etq_lidar" type="lidar_projection"/>
 
-  <node name="map_filters" pkg="etq_lidar" type="map_filters" output="screen">
+  <node name="map_filters" pkg="etq_lidar" type="map_filters">
     <rosparam command="load" file="$(find etq_lidar)/config/map_filters.yaml" />
+  </node>
+
+  <node name="local_planner" pkg="etq_planner" type="local_planner" output="screen">
+    <rosparam command="load" file="$(find etq_planner)/config/local_planner.yaml" />
   </node>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find etq_demo)/rviz_config.rviz"/>
