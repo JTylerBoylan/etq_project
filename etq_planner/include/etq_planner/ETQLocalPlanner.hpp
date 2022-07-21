@@ -69,7 +69,7 @@ namespace etq_planner
         std::vector<float> _velocity_lookup;
         std::vector<float> _rotation_lookup;
         float _max_velocity;
-        float _min_rotation;
+        float _max_rotation;
 
         // Store the node buffer
         // Max amount of nodes is (the max number of iterations) * (number of nodes per iteration) + (1 for start node)
