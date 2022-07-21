@@ -205,7 +205,7 @@ namespace etq_planner
 	    Eigen::Vector2f normal(_grid->atPosition("normal_x", position), _grid->atPosition("normal_y", position));
 		
             // Get heading dot product
-	    float head = abs(normal.x() * velocity.x()) + abs(normal.y() * velocity.y());
+	    float head = abs(normal.x() * velocity.x() + normal.y() * velocity.y());
 
             // Add cost from heading
 	    node.g += head * _cost_head;
