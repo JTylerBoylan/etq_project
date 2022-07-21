@@ -59,8 +59,7 @@ namespace etq_planner
 
         // Set the class variables
         _grid = &grid;
-        _start = start;
-        _goal = goal;
+        _goal = Vector2d(goal.x, goal.y);
 
         _iter = 0;
         _high = 0;
@@ -97,9 +96,15 @@ namespace etq_planner
             queue.pop();
 
             Node node = _buffer[_best];
+		
+	    Position position(node.x, node.y);
+		
+	    // Bounds check
+	    if (!_grid->isInside(position))
+		break;
             
             // Goal check
-            if (_in_goal_region(node)) {
+	    if ((_goal - position).normal() <= _goal_radius) {
                 _path_found = true;
                 break;
             }
@@ -167,8 +172,8 @@ namespace etq_planner
         node.t += 1;
 
         // Get velocities
-        node.v = _vel(node, n);
-        node.u = _rot(node, n);
+        node.v = _velocity_lookup[n];
+        node.u = _rotation_lookup[n];
 
         // Sampling
         float t = 0;
@@ -186,6 +191,9 @@ namespace etq_planner
 		
 	    // Grid map position
 	    Position position(node.x, node.y);
+		
+	    if (_grid->atPosition("traversable", position) == 0)
+	    	break;
 		
 	    // Get normal vector
 	    Eigen::Vector2f normal(_grid->atPosition("normal_x", position), _grid->atPosition("normal_y", position));
@@ -216,7 +224,7 @@ namespace etq_planner
 	node.g += _cost_delta_u * (node.u - _node.u);
 	    
         // Recalculate f score
-        node.f = _f(node);
+        node.f =_h(node) + node.g;
 
         // Copy to buffer
         _buffer[buf] = node;
@@ -232,33 +240,6 @@ namespace etq_planner
         if (dw > M_PI || dw < -M_PI)
             dw += dw > M_PI ? -2.0f*M_PI : 2.0f*M_PI;
         return sqrtf(dx*dx + dy*dy)/V_MAX + abs(dw)/U_MAX;
-    }
-
-    // F score of a node
-    float ETQLocalPlanner::_f(const Node& node) {
-        return _h(node) + node.g;
-    }
-
-    // Determine if node is in goal region
-    bool ETQLocalPlanner::_in_goal_region(const Node& node) {
-        float dx = node.x - _goal.x;
-        float dy = node.y - _goal.y;
-        return dx*dx + dy*dy <= _goal_radius * _goal_radius;
-    }
-
-    // Determine if node is in valid position
-    bool ETQLocalPlanner::_is_valid(const Node& node) {
-        return _grid->atPosition("traversable", Position(node.x, node.y)) != 0;
-    }
-
-    // Get velocity of node
-    float ETQLocalPlanner::_vel(const Node& node, const int n) {
-        return _velocity_lookup[n];
-    }
-
-    // Get rotational velocity of node
-    float ETQLocalPlanner::_rot(const Node& node, const int n) {
-        return _rotation_lookup[n];
     }
     
     // Convert node to pose
