@@ -47,14 +47,15 @@ namespace etq_planner
 
         // Struct to hold node information
         struct Node {
-            float x, y, z;  // Position
-            float a, b, c;  // Orientation
-            float v, u;     // Velocity
+            float x, y;     // Position
+            float w;        // Orientation
+            float v, u;     // Velocity & Rotation
             float g, f;     // Heuristic
             int i, p;       // Index
             int t;          // Generation
         };
 
+        // Planner paramaters
         int _max_iterations;
         int _max_generations;
         float _goal_radius;
@@ -63,6 +64,7 @@ namespace etq_planner
         float _cost_time;
         float _cost_delta_v;
         float _cost_delta_u;
+        float _cost_head;
         int _sample_size;
         std::vector<float> _velocity_lookup;
         std::vector<float> _rotation_lookup;
@@ -97,9 +99,6 @@ namespace etq_planner
 
         // F score of node
         float _f(const Node& node);
-
-        // G score of node
-        float _g(const Node& node);
 
         // Determine if node is in goal region
         bool _in_goal_region(const Node& node);
