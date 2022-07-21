@@ -1,5 +1,7 @@
 #include <etq_planner/ETQLocalPlanner.hpp>
 
+#define ETQ_HEIGHT 0.5
+
 namespace etq_planner 
 {
 
@@ -7,44 +9,48 @@ namespace etq_planner
 
 	// Get Node Parameters
 	if (!node_handle.getParam("max_iterations", _max_iterations))
-        	_max_iterations = DEFAULT_MAX_PLAN_ITERATIONS_LOCAL;
+        	ROS_ERROR("Missing parameter: max_iterations");
 
 	if (!node_handle.getParam("max_generations", _max_generations))
-        	_max_generations = DEFAULT_MAX_GENERATIONS_LOCAL;
+        	ROS_ERROR("Missing parameter: max_generations");
 
 	if (!node_handle.getParam("goal_radius", _goal_radius))
-		_goal_radius = DEFAULT_GOAL_RADIUS;
+		ROS_ERROR("Missing parameter: goal_radius");
 
 	if (!node_handle.getParam("sample_time", _sample_time))
-		_sample_time = DEFAULT_SAMPLE_TIME;
+		ROS_ERROR("Missing parameter: sample_time");
 
 	if (!node_handle.getParam("sample_delta_time", _sample_delta_time))
-		_sample_delta_time = DEFAULT_SAMPLE_DELTA_TIME;
+		ROS_ERROR("Missing parameter: sample_delta_time");
 
 	if (!node_handle.getParam("cost_per_unit_time", _cost_time))
-		_cost_time = DEFAULT_COST_TIME;
+		ROS_ERROR("Missing parameter: cost_per_unit_time");
 
 	if (!node_handle.getParam("cost_per_unit_deltav", _cost_delta_v))
-		_cost_delta_v = DEFAULT_COST_DELTA_V;
+		ROS_ERROR("Missing parameter: cost_per_unit_deltav");
 
 	if (!node_handle.getParam("cost_per_unit_deltau", _cost_delta_u))
-		_cost_delta_u = DEFAULT_COST_DELTA_U;
+		ROS_ERROR("Missing parameter: cost_per_unit_deltau");
 	    
 	if (!node_handle.getParam("cost_per_unit_head", _cost_head))
-		_cost_head = DEFAULT_COST_HEAD;
+		ROS_ERROR("Missing parameter: cost_per_unit_head");
 
 	if (!node_handle.getParam("sample_size", _sample_size))
-		_sample_size = DEFAULT_SAMPLE_SIZE;
+		ROS_ERROR("Missing parameter: sample_size");
 
 	if (!node_handle.getParam("sample_velocities", _velocity_lookup))
-		_velocity_lookup = DEFAULT_VELOCITY_LOOKUP_TABLE;
+		ROS_ERROR("Missing parameter: sample_velocities");
 
 	if (!node_handle.getParam("sample_rotations", _rotation_lookup))
-		_rotation_lookup = DEFAULT_ROTATION_LOOKUP_TABLE;
+		ROS_ERROR("Missing parameter: sample_rotations");
 
 	if (_velocity_lookup.size() != _sample_size || _rotation_lookup.size() != _sample_size)
 		ROS_WARN("Mismatch of sample size and sample array size:\nsample_size: %i\nsample_velocities (size): %i\nsample_rotations (size): %i", 
             _sample_size, _velocity_lookup.size(), _rotation_lookup.size());
+	    
+	// Grab max velocity and min rotation from array
+	_max_velocity = max(_velocity_lookup);
+	_max_rotation = max(_rotation_lookup);
 
 	// Initialize Node buffer
         _buffer = new Node[_max_iterations*_sample_size + 1];
@@ -239,7 +245,7 @@ namespace etq_planner
         dw = atan2f(dy,dx) - node.w;
         if (dw > M_PI || dw < -M_PI)
             dw += dw > M_PI ? -2.0f*M_PI : 2.0f*M_PI;
-        return sqrtf(dx*dx + dy*dy)/V_MAX + abs(dw)/U_MAX;
+        return sqrtf(dx*dx + dy*dy)/_max_velocity + abs(dw)/_max_rotation;
     }
     
     // Convert node to pose
