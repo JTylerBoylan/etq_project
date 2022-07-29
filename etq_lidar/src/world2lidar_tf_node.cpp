@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
     ros::init(argc, argv, "world2lidar_transformer");
 
-    ros::NodeHandle node;
+    ros::NodeHandle node("etq");
 
     tf2_ros::TransformBroadcaster br;
 
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 
     };
 
-    ros::Subscriber pose_sub = node.subscribe<geometry_msgs::PoseStamped>("/etq/pose", 1, poseCallback);
+    ros::Subscriber pose_sub = node.subscribe<geometry_msgs::PoseStamped>("pose", 1, poseCallback);
 
     ros::spin();
 

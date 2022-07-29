@@ -10,9 +10,9 @@ int main (int argc, char** argv) {
 
     ros::init(argc, argv, "pose_estimator");
 
-    ros::NodeHandle node;
+    ros::NodeHandle node("etq");
 
-    ros::Publisher pose_pub = node.advertise<geometry_msgs::PoseStamped>("etq/pose", 1, true);
+    ros::Publisher pose_pub = node.advertise<geometry_msgs::PoseStamped>("pose", 1, true);
 
     // DEMO POSITION
     geometry_msgs::Point pos;
@@ -35,7 +35,7 @@ int main (int argc, char** argv) {
         pose_pub.publish(pose);
     };
 
-    ros::Subscriber imu_sub = node.subscribe<sensor_msgs::Imu>("imu/data", 1, imuCallback);
+    ros::Subscriber imu_sub = node.subscribe<sensor_msgs::Imu>("/imu/data", 1, imuCallback);
 
     ros::spin();
 }

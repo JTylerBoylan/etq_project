@@ -11,7 +11,7 @@ using namespace grid_map;
 int main (int argc, char ** argv) {
   
   ros::init(argc, argv, "map_filters");
-  ros::NodeHandle node("~");
+  ros::NodeHandle node("etq");
   
   filters::FilterChain<grid_map::GridMap> filterChain("grid_map::GridMap");
   if (!filterChain.configure("grid_map_filters", node)) {
@@ -19,7 +19,7 @@ int main (int argc, char ** argv) {
     return 0;
   }
 
-  ros::Publisher map_pub = node.advertise<grid_map_msgs::GridMap>("/etq/map", 10, true);
+  ros::Publisher map_pub = node.advertise<grid_map_msgs::GridMap>("map", 10, true);
   
   auto mapCallback = [&](const grid_map_msgs::GridMapConstPtr &msg_in) {
 
@@ -56,7 +56,7 @@ int main (int argc, char ** argv) {
     
   };
   
-  ros::Subscriber map_sub = node.subscribe<grid_map_msgs::GridMap>("/etq/elevation_map", 10, mapCallback);
+  ros::Subscriber map_sub = node.subscribe<grid_map_msgs::GridMap>("elevation_map", 10, mapCallback);
 
   ros::spin();
   

@@ -11,17 +11,20 @@ using namespace grid_map;
 int main (int argc, char **argv) {
 
     ros::init(argc, argv, "local_planner");
-    ros::NodeHandle nh("~");
+    ros::NodeHandle nh("etq");
 
     GridMap grid;
 
     Pose start;
     Point goal;
 
+    bool init = false;
+
     ETQLocalPlanner planner(nh);
 
     auto mapUpdate = [&](const grid_map_msgs::GridMap::ConstPtr& grid_msg) {
         GridMapRosConverter::fromMessage(*grid_msg, grid);
+        init = true;
     };
 
     auto positionUpdate = [&](const geometry_msgs::PoseStamped::ConstPtr& pose_msg) {
@@ -32,12 +35,12 @@ int main (int argc, char **argv) {
         goal = goal_msg->point;
     };
 
-    ros::Subscriber map_sub = nh.subscribe<grid_map_msgs::GridMap>("etq/map", 1, mapUpdate);
-    ros::Subscriber pos_sub = nh.subscribe<geometry_msgs::PoseStamped>("etq/pose", 1, positionUpdate);
-    ros::Subscriber goal_sub = nh.subscribe<geometry_msgs::PointStamped>("etq/goal", 1, goalUpdate);
+    ros::Subscriber map_sub = nh.subscribe<grid_map_msgs::GridMap>("map", 1, mapUpdate);
+    ros::Subscriber pos_sub = nh.subscribe<geometry_msgs::PoseStamped>("pose", 1, positionUpdate);
+    ros::Subscriber goal_sub = nh.subscribe<geometry_msgs::PointStamped>("goal", 1, goalUpdate);
 
-    ros::Publisher pub_poses = nh.advertise<geometry_msgs::PoseArray>("etq/poses", 1, true);
-    ros::Publisher pub_path = nh.advertise<geometry_msgs::PoseArray>("etq/path", 1, true);
+    ros::Publisher pub_poses = nh.advertise<geometry_msgs::PoseArray>("poses", 1, true);
+    ros::Publisher pub_path = nh.advertise<geometry_msgs::PoseArray>("path", 1, true);
 
     int iter = 0;
     float ttime = 0.0f;
@@ -47,6 +50,10 @@ int main (int argc, char **argv) {
 
     while (nh.ok()) {
 
+        if (!init) {
+            ros::spinOnce();
+            continue;
+        }
 
         clock_t cstart, cend;
 
@@ -95,9 +102,8 @@ int main (int argc, char **argv) {
         pub_path.publish(path_arr);
         ROS_INFO("Path poses array (timestamp %f) published.", pose_arr.header.stamp.toSec());
 
-
-        ros::spinOnce();
         rate.sleep();
+        ros::spinOnce();
     }
 
     return 0;

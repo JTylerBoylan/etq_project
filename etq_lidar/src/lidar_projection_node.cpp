@@ -9,30 +9,17 @@ using namespace etq_lidar;
 int main(int argc, char ** argv) {
 
     ros::init(argc, argv, "lidar_projector");
-    ros::NodeHandle nh;
+    ros::NodeHandle nh("etq");
 
-    ros::Publisher map_pub = nh.advertise<grid_map_msgs::GridMap>("etq/elevation_map", 1, true);
+    ros::Publisher map_pub = nh.advertise<grid_map_msgs::GridMap>("elevation_map", 1, true);
 
     geometry_msgs::Pose latest_pose;
     sensor_msgs::LaserScan latest_scan;
 
     grid_map::GridMap map({"elevation"});
-
-/*
-              "elevation_inpainted",
-              "elevation_smooth",
-              "normal_x",
-              "normal_y",
-              "normal_z",
-              "slope",
-              "roughness",
-              "edges",
-              "traversability"
-              });
-*/
     
     map.setFrameId("world");
-    map.setGeometry(grid_map::Length(7.5,7.5), 0.0625, grid_map::Position(0,0));
+    map.setGeometry(grid_map::Length(7.5,7.5), 0.0625);
 
     ETQLidarMap lidar(map);
 
@@ -46,7 +33,7 @@ int main(int argc, char ** argv) {
         latest_scan = *msg;
     };
 
-    ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>("etq/pose", 10, poseCallback);
+    ros::Subscriber pose_sub = nh.subscribe<geometry_msgs::PoseStamped>("pose", 10, poseCallback);
 
     ros::Subscriber laser_sub = nh.subscribe<sensor_msgs::LaserScan>("/scan", 10, laserCallback);
 

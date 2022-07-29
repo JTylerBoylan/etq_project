@@ -1,60 +1,60 @@
 #include <etq_planner/ETQLocalPlanner.hpp>
 
-#define ETQ_HEIGHT 0.5
+#define ETQ_HEIGHT 0.25
 
 namespace etq_planner 
 {
 
     ETQLocalPlanner::ETQLocalPlanner(ros::NodeHandle node_handle) { 
 
-	// Get Node Parameters
-	if (!node_handle.getParam("max_iterations", _max_iterations))
-        	ROS_ERROR("Missing parameter: max_iterations");
+        // Get Node Parameters
+        if (!node_handle.getParam("max_iterations", _max_iterations))
+            ROS_ERROR("Missing parameter: max_iterations");
 
-	if (!node_handle.getParam("max_generations", _max_generations))
-        	ROS_ERROR("Missing parameter: max_generations");
+        if (!node_handle.getParam("max_generations", _max_generations))
+            ROS_ERROR("Missing parameter: max_generations");
 
-	if (!node_handle.getParam("goal_radius", _goal_radius))
-		ROS_ERROR("Missing parameter: goal_radius");
+        if (!node_handle.getParam("goal_radius", _goal_radius))
+            ROS_ERROR("Missing parameter: goal_radius");
 
-	if (!node_handle.getParam("sample_time", _sample_time))
-		ROS_ERROR("Missing parameter: sample_time");
+        if (!node_handle.getParam("sample_time", _sample_time))
+            ROS_ERROR("Missing parameter: sample_time");
 
-	if (!node_handle.getParam("sample_delta_time", _sample_delta_time))
-		ROS_ERROR("Missing parameter: sample_delta_time");
+        if (!node_handle.getParam("sample_delta_time", _sample_delta_time))
+            ROS_ERROR("Missing parameter: sample_delta_time");
 
-	if (!node_handle.getParam("cost_per_unit_time", _cost_time))
-		ROS_ERROR("Missing parameter: cost_per_unit_time");
+        if (!node_handle.getParam("cost_per_unit_time", _cost_time))
+            ROS_ERROR("Missing parameter: cost_per_unit_time");
 
-	if (!node_handle.getParam("cost_per_unit_deltav", _cost_delta_v))
-		ROS_ERROR("Missing parameter: cost_per_unit_deltav");
+        if (!node_handle.getParam("cost_per_unit_deltav", _cost_delta_v))
+            ROS_ERROR("Missing parameter: cost_per_unit_deltav");
 
-	if (!node_handle.getParam("cost_per_unit_deltau", _cost_delta_u))
-		ROS_ERROR("Missing parameter: cost_per_unit_deltau");
-	    
-	if (!node_handle.getParam("cost_per_unit_head", _cost_head))
-		ROS_ERROR("Missing parameter: cost_per_unit_head");
+        if (!node_handle.getParam("cost_per_unit_deltau", _cost_delta_u))
+            ROS_ERROR("Missing parameter: cost_per_unit_deltau");
+            
+        if (!node_handle.getParam("cost_per_unit_head", _cost_head))
+            ROS_ERROR("Missing parameter: cost_per_unit_head");
 
-	if (!node_handle.getParam("sample_size", _sample_size))
-		ROS_ERROR("Missing parameter: sample_size");
+        if (!node_handle.getParam("sample_size", _sample_size))
+            ROS_ERROR("Missing parameter: sample_size");
 
-	if (!node_handle.getParam("sample_velocities", _velocity_lookup))
-		ROS_ERROR("Missing parameter: sample_velocities");
+        if (!node_handle.getParam("sample_velocities", _velocity_lookup))
+            ROS_ERROR("Missing parameter: sample_velocities");
 
-	if (!node_handle.getParam("sample_rotations", _rotation_lookup))
-		ROS_ERROR("Missing parameter: sample_rotations");
+        if (!node_handle.getParam("sample_rotations", _rotation_lookup))
+            ROS_ERROR("Missing parameter: sample_rotations");
 
-	if (_velocity_lookup.size() != _sample_size || _rotation_lookup.size() != _sample_size)
-		ROS_WARN("Mismatch of sample size and sample array size:\nsample_size: %i\nsample_velocities (size): %i\nsample_rotations (size): %i", 
-            _sample_size, int(_velocity_lookup.size()), int(_rotation_lookup.size()));
-	    
-    if (!node_handle.getParam("max_velocity", _max_velocity))
-		ROS_ERROR("Missing parameter: max_velocity");
+        if (_velocity_lookup.size() != _sample_size || _rotation_lookup.size() != _sample_size)
+            ROS_ERROR("Mismatch of sample size and sample array size:\nsample_size: %i\nsample_velocities (size): %i\nsample_rotations (size): %i", 
+                _sample_size, int(_velocity_lookup.size()), int(_rotation_lookup.size()));
+            
+        if (!node_handle.getParam("max_velocity", _max_velocity))
+            ROS_ERROR("Missing parameter: max_velocity");
 
-    if (!node_handle.getParam("max_rotation", _max_rotation))
-		ROS_ERROR("Missing parameter: max_rotation");
+        if (!node_handle.getParam("max_rotation", _max_rotation))
+            ROS_ERROR("Missing parameter: max_rotation");
 
-	// Initialize Node buffer
+	    // Initialize Node buffer
         _buffer = new Node[_max_iterations*_sample_size + 1];
     }
 
@@ -107,21 +107,15 @@ namespace etq_planner
             
             Position position(node.x, node.y);
 
-            ROS_INFO("A");
-            
             // Bounds check
             if (!_grid->isInside(position))
                 break;
-
-            ROS_INFO("B");
                 
             // Goal check
             if ((_goal - position).norm() <= _goal_radius) {
                 _path_found = true;
                 break;
             }
-
-            ROS_INFO("C");
             
             //  Generation check
             if (node.t > _max_generations)
@@ -158,8 +152,9 @@ namespace etq_planner
     void ETQLocalPlanner::toPoseArray(geometry_msgs::PoseArray &arr_msg) {
         // Back propogate
         for (int i = _best; i != -1; i = _buffer[i].p) {
-            arr_msg.poses.push_back(_node2pose(_buffer[i]));
-            ROS_INFO("i: %d , x: %.2f, y: %.2f, w: %.2f", i, _buffer[i].x, _buffer[i].y, _buffer[i].w);
+            if (_grid->isInside(Position(_buffer[i].x, _buffer[i].y)))
+                arr_msg.poses.push_back(_node2pose(_buffer[i]));
+            ROS_INFO("i: %d , x: %.2f, y: %.2f, w: %.2f, p: %i", i, _buffer[i].x, _buffer[i].y, _buffer[i].w, _buffer[i].p);
         }
     }
 
@@ -206,9 +201,16 @@ namespace etq_planner
             // Grid map position
             Position position(node.x, node.y);
 
+            if (!_grid->isInside(position)) {
+                buf = 0;
+                return;
+            }
+
             // Obstacle check
-            if (_grid->atPosition("traversable", position) == 0)
-                break;
+            if (_grid->atPosition("traversable", position) == 0) {
+                buf = 0;
+                return;
+            }
 
             // Get normal vector
             Eigen::Vector2f normal(_grid->atPosition("normal_x", position), _grid->atPosition("normal_y", position));
@@ -264,14 +266,14 @@ namespace etq_planner
 	    
         p.position.x = node.x;
         p.position.y = node.y;
-        p.position.z = _grid->atPosition("elevation", pos);
+        p.position.z = _grid->atPosition("elevation_inpainted", pos) + ETQ_HEIGHT;
 	
 	    double sin_w2 = sin(node.w / 2.0);
         p.orientation.x = _grid->atPosition("normal_x", pos) * sin_w2;
         p.orientation.y = _grid->atPosition("normal_y", pos) * sin_w2;
         p.orientation.z = _grid->atPosition("normal_z", pos) * sin_w2;
         p.orientation.w = cos(node.w / 2.0);
-	    
+
         return p;
     }
 
